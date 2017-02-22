@@ -19,6 +19,24 @@ def index():
   """
   pass
 
+@app.route('/inventory/products', methods=['GET'])
+def get_product_list():
+  """ Get info about all products
+
+    This method will get the info about all the products
+
+    Args:
+      no arguments
+
+    Returns:
+      response: product information(product id, location id, used/new/open_box, total_quantity, restock_level)
+      status 200 if succeeded
+
+    Todo:
+      * Finish the implementations.
+      * Write the tests for this.
+
+    """
 
 @app.route('/inventory/products/<int:id>', methods=['PUT'])
 def update_product(id):
