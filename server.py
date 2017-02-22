@@ -41,3 +41,21 @@ def update_product(id):
 
   """
   pass
+
+
+
+@app.route('/inventory/products/', methods= ['Post'])
+def create_products():
+
+
+
+    pass
+
+
+
+@app.route('/inventory/products/<int: id>', methods=['DELETE'])
+def delete_products(id):
+
+
+    pass
+
