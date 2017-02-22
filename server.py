@@ -3,7 +3,7 @@ from flask import Flask
 # Create Flask application
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/inventory')
 def index():
   """ Intro page of the inventory API
 
