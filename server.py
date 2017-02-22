@@ -41,3 +41,26 @@ def update_product(id):
 
   """
   pass
+
+@app.route('inventory/products/<int:id>', methods=['DELETE'])
+def delete_product(id):
+  """
+    This method will delete an existing product from inventory
+    or simply will do nothing if it does not exist.
+
+    Args:
+      id (int): The id of the product to be deleted
+
+    Returns:
+      response: Delete successful message with status 200 if product exist and is deleted
+                or no product found with status 404 if product does not exist
+                or invalid update with status 400 if the amount in inventory is less than
+                amount to be deleted
+
+    Todo:
+     * Finish the implementation
+     * Write test cases
+
+  """
+
+  pass
