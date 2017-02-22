@@ -46,16 +46,22 @@ def update_product(id):
 
 @app.route('/inventory/products/', methods= ['POST'])
 def create_products():
+    """
 
+    This method will create a storage for a new product
 
+    Args:
 
+    Returns:
+      response: create successful message with status 201 if succeeded
+                or invalid update with status 400 if the create request violates any limitation
+                or conflict update with status 409 there is a identical product alredy in the data.
+
+    Todo:
+      * Finish the implementations.
+      * Write the tests for this.
+
+    """
     pass
 
-
-
-@app.route('/inventory/products/<int: id>', methods=['DELETE'])
-def delete_products(id):
-
-
-    pass
 
