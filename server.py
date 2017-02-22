@@ -44,7 +44,7 @@ def update_product(id):
 
 
 
-@app.route('/inventory/products/', methods= ['Post'])
+@app.route('/inventory/products/', methods= ['POST'])
 def create_products():
 
 
