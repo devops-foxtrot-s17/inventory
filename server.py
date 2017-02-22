@@ -20,7 +20,7 @@ def index():
   pass
 
 
-@app.route('/products/<int:id>', methods=['PUT'])
+@app.route('/inventory/products/<int:id>', methods=['PUT'])
 def update_product(id):
   """ Update info about a product
 
