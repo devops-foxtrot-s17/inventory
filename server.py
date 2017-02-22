@@ -18,3 +18,26 @@ def index():
 
   """
   pass
+
+
+@app.route('/products/<int:id>', methods=['PUT'])
+def update_product(id):
+  """ Update info about a product
+
+  This method will update the info about a product
+  (eg. amount of new, open box or used.)
+
+  Args:
+    id (string): The id of the product to be update
+
+  Returns:
+    response: update successful message with status 200 if succeeded
+              or no product found with status 404 if cannot found the product
+              or invalid update with status 400 if the update violates any limitation.
+
+  Todo:
+    * Finish the implementations.
+    * Write the tests for this.
+
+  """
+  pass
