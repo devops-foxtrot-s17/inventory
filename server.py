@@ -51,6 +51,7 @@ def get_one_product(id):
     Returns:
       response: product id information(product id, location id, used/new/open_box, total_quantity, restock_level)
       status 200 if succeeded
+      or no product found with status 404 if cannot found the product
 
     Todo:
       * Finish the implementations.
