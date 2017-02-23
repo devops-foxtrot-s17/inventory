@@ -38,6 +38,28 @@ def get_product_list():
 
     """
 
+
+@app.route('/inventory/products/<int:id>', methods=['GET'])
+def get_one_product(id):
+  """ Get info about a specific product
+
+    This method will get the info about an item with it's product id
+
+    Args:
+      id (int): The id of the product to be update
+
+    Returns:
+      response: product id information(product id, location id, used/new/open_box, total_quantity, restock_level)
+      status 200 if succeeded
+
+    Todo:
+      * Finish the implementations.
+      * Write the tests for this.
+
+    """
+
+
+
 @app.route('/inventory/products/<int:id>', methods=['PUT'])
 def update_product(id):
   """ Update info about a product
