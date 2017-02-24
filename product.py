@@ -1,7 +1,7 @@
 
 class Product:
 
-    def __init__(self, product_id, location_id, used, new, open_box, total_quantity, restock_level):
+    def __init__(self, product_id, location_id, used, new, open_box, restock_level):
 
         if product_id is None:
             raise AttributeError('ID can not be empty!')
@@ -29,13 +29,6 @@ class Product:
             self.open_box = 0
         else:
             self.open_box = int(open_box)
-
-        if total_quantity is None or total_quantity is not int:
-            self.total_quantity = used + new + open_box
-        elif total_quantity != self.used + self.new + self.open_box:
-            raise ValueError('Sum of used, new and open_box must be equal to total quantity!')
-        else:
-            self.total_quantity = int(total_quantity)
 
         if restock_level is None or restock_level is not int:
             self.restock_level = 0
