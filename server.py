@@ -42,7 +42,7 @@ def update_product(id):
   """
   pass
 
-@app.route('inventory/products/<int:id>', methods=['DELETE'])
+@app.route('/inventory/products/<int:id>', methods=['DELETE'])
 def delete_product(id):
   """
     This method will delete an existing product from inventory
