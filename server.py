@@ -61,18 +61,40 @@ def get_one_product(id):
 
 
 
-@app.route('/inventory/products/<int:id>', methods=['PUT'])
-def update_product(id):
-  """ Update info about a product
+@app.route('/inventory/products/<int:id>/add', methods=['PUT'])
+def add_to_product(id):
+  """ add certain amount to product
 
-  This method will update the info about a product
-  (eg. amount of new, open box or used.)
+  This method will add certain amount to product in the inventory
+  (eg. certain amount in new, open box or used.)
 
   Args:
-    id (string): The id of the product to be update
+    id (int): The id of the product to be added to
 
   Returns:
-    response: update successful message with status 200 if succeeded
+    response: add successful message with status 200 if succeeded
+              or no product found with status 404 if cannot found the product
+              or invalid update with status 400 if the update violates any limitation.
+
+  Todo:
+    * Finish the implementations.
+    * Write the tests for this.
+
+  """
+  pass
+
+@app.route('/inventory/products/<int:id>/remove', methods=['PUT'])
+def remove_from_product(id):
+  """ remove certain amount from product
+
+  This method will remove certain amount from product
+  (eg. amount in new, open box or used.)
+
+  Args:
+    id (int): The id of the product to be removed from
+
+  Returns:
+    response: remove successful message with status 200 if succeeded
               or no product found with status 404 if cannot found the product
               or invalid update with status 400 if the update violates any limitation.
 
