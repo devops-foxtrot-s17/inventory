@@ -35,3 +35,14 @@ class BaseInventory:
       If put success or not.
     """
     pass
+
+  def delete_product(self, product_id):
+    """ Delete the product from the inventory
+
+    Args:
+      product_id(int): the id of the product to be deleted
+
+    Returns:
+      If delete success or not.
+    """
+    pass
