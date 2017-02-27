@@ -1,7 +1,23 @@
-from flask import Flask
+import logging
+import os
 
-# Create Flask application
+from flask import Flask, jsonify, make_response
+
+from dict_inventory import DictInventory
+
 app = Flask(__name__)
+app.config['LOGGING_LEVEL'] = logging.INFO
+
+# Status Codes
+HTTP_200_OK = 200
+HTTP_201_CREATED = 201
+HTTP_204_NO_CONTENT = 204
+HTTP_400_BAD_REQUEST = 400
+HTTP_404_NOT_FOUND = 404
+HTTP_409_CONFLICT = 409
+
+
+inventory = DictInventory()
 
 @app.route('/inventory')
 def index():
@@ -17,7 +33,10 @@ def index():
     * Write the tests for this.
 
   """
-  pass
+  welcome_info = {'api': "inventory",
+                  'message': "This is the index page of /inventory. "
+                             "To see all products, please access /inventory/products"}
+  return make_response(jsonify(welcome_info), HTTP_200_OK)
 
 @app.route('/inventory/products', methods=['GET'])
 def get_product_list():
@@ -36,7 +55,9 @@ def get_product_list():
       * Finish the implementations.
       * Write the tests for this.
 
-    """
+  """
+  all_products = inventory.get_all()
+  return make_response(jsonify(all_products), HTTP_200_OK)
 
 
 @app.route('/inventory/products/<int:id>', methods=['GET'])
@@ -148,3 +169,10 @@ def create_products():
 
     """
     pass
+
+
+if __name__ == "__main__":
+    # Pull options from environment
+    debug = (os.getenv('DEBUG', 'False') == 'True')
+    port = os.getenv('PORT', '5000')
+    app.run(host='0.0.0.0', port=int(port), debug=debug)
