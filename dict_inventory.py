@@ -37,8 +37,11 @@ class DictInventory(BaseInventory):
 
 
   def delete_product(self, product_id):
-    del self.products[product_id]
-    return True
+    if product_id in self.products:
+      del self.products[product_id]
+      return True
+    else:
+      raise KeyError('No product with product id %d' % product_id)
 
   def test_init(self):
     self.products[1] = Product(1,1,1,1,1,4)
