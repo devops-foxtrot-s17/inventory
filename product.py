@@ -5,7 +5,7 @@ class Product:
 
         if product_id is None:
             raise AttributeError('ID can not be empty!')
-        elif product_id is not int:
+        elif type(product_id) is not int:
             raise AttributeError('ID must be integer!')
         else:
             self.product_id = int(product_id)
@@ -39,5 +39,5 @@ class Product:
     def __str__(self):
         return 'Product id: ' + str(self.product_id) + ', location: ' + str(self.location_id) + ', # used: ' + \
                str(self.used) + ', # new: ' + str(self.new) + ', # open box: ' + str(self.open_box) + \
-                ', # total: ' + str(self.total_quantity) + ', restock at: ' + str(self.restock_level)
+                ', # total: ' + str(self.used + self.new + self.open_box) + ', restock at: ' + str(self.restock_level)
 
