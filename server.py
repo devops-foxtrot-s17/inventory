@@ -77,8 +77,12 @@ def get_one_product(id):
     Todo:
       * Finish the implementations.
       * Write the tests for this.
-
     """
+  product = inventory.get_product(id)
+  if product is not None:
+    return make_response(product.__str__(), HTTP_200_OK)
+  else:
+    return make_response("Product not found", HTTP_404_NOT_FOUND)
 
 
 
