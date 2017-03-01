@@ -149,9 +149,15 @@ def delete_product(id):
      * Finish the implementation
      * Write test cases
 
-  """
+ """
+  result = inventory.delete_product(id);
+  if result is True:
+      return make_response('', HTTP_204_NO_CONTENT)
+  else:
+      message = {'error' : 'product %s was not found' % id}
+      rc = HTTP_404_NOT_FOUND
+      return make_response(jsonify(message), rc)
 
-  pass
 
 @app.route('/inventory/products/', methods= ['POST'])
 def create_products():
