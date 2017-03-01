@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import Flask, jsonify, make_response
+from flask import Flask, jsonify, make_response, request
 
 from dict_inventory import DictInventory
 
@@ -102,7 +102,18 @@ def add_to_product(id):
     * Write the tests for this.
 
   """
-  pass
+  product = inventory.get_product(id)
+  if product is not None:
+      info = request.get_json()
+      if is_valid(info):
+         inventory.put_product(id, info)
+      else:
+          make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
+      return make_response(product.__str__(), HTTP_200_OK)
+  else:
+      return make_response("Product not found", HTTP_404_NOT_FOUND)
+
+
 
 @app.route('/inventory/products/<int:id>/remove', methods=['PUT'])
 def remove_from_product(id):
@@ -170,6 +181,31 @@ def create_products():
     """
     pass
 
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+def is_valid(info):
+    valid = False
+    try:
+        product_id = info['product_id']
+        location_id = info['location_id']
+        used = info['used']
+        new = info['new']
+        open_box = info['open_box']
+        restock_level = info['restock_level']
+        valid = True
+    except KeyError as err:
+        app.logger.warn('Missing parameter error: %s', err)
+    except TypeError as err:
+        app.logger.warn('Invalid Content Type error: %s', err)
+
+    return valid
+
+
+######################################################################
+#   M A I N
+######################################################################
 
 if __name__ == "__main__":
     # Pull options from environment
