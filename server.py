@@ -142,8 +142,6 @@ def delete_product(id):
     Returns:
       response: Delete successful message with status 200 if product exist and is deleted
                 or no product found with status 404 if product does not exist
-                or invalid update with status 400 if the amount in inventory is less than
-                amount to be deleted
 
     Todo:
      * Finish the implementation
