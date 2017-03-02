@@ -140,7 +140,7 @@ def delete_product(id):
       id (int): The id of the product to be deleted
 
     Returns:
-      response: Delete successful message with status 200 if product exist and is deleted
+      response: Delete successful message with status 204 if product exist and is deleted
                 or no product found with status 404 if product does not exist
 
     Todo:
