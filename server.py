@@ -2,8 +2,8 @@ import logging
 import os
 
 from flask import Flask, jsonify, make_response, request
-
 from dict_inventory import DictInventory
+from product import Product
 
 app = Flask(__name__)
 app.config['LOGGING_LEVEL'] = logging.INFO
@@ -16,159 +16,226 @@ HTTP_400_BAD_REQUEST = 400
 HTTP_404_NOT_FOUND = 404
 HTTP_409_CONFLICT = 409
 
-
 inventory = DictInventory()
+
 
 @app.route('/inventory')
 def index():
-  """ Intro page of the inventory API
+    """ Intro page of the inventory API
 
-  This method will only return some welcome words.
-
-  Returns:
-    response: welcome words in json format and status 200
-
-  Todo:
-    * Finish the implementations.
-    * Write the tests for this.
-
-  """
-  welcome_info = {'api': "inventory",
-                  'message': "This is the index page of /inventory. "
-                             "To see all products, please access /inventory/products"}
-  return make_response(jsonify(welcome_info), HTTP_200_OK)
-
-@app.route('/inventory/products', methods=['GET'])
-def get_product_list():
-  """ Get info about all products
-
-    This method will get the info about all the products
-
-    Args:
-      no arguments
+    This method will only return some welcome words.
 
     Returns:
-      response: product information(product id, location id, used/new/open_box, total_quantity, restock_level)
-      status 200 if succeeded
+      response: welcome words in json format and status 200
 
     Todo:
       * Finish the implementations.
       * Write the tests for this.
 
-  """
-  all_products = inventory.get_all()
-  return make_response(jsonify(all_products), HTTP_200_OK)
+    """
+    welcome_info = {'api': "inventory",
+                    'message': "This is the index page of /inventory. "
+                               "To see all products, please access /inventory/products"}
+    return make_response(jsonify(welcome_info), HTTP_200_OK)
+
+
+@app.route('/inventory/products', methods=['GET'])
+def get_product_list():
+    """ Get info about all products
+
+      This method will get the info about all the products
+
+      Args:
+        no arguments
+
+      Returns:
+        response: product information(product id, location id, used/new/open_box, total_quantity, restock_level)
+        status 200 if succeeded
+
+      Todo:
+        * Finish the implementations.
+        * Write the tests for this.
+
+    """
+    all_products = inventory.get_all()
+    return make_response(jsonify(all_products), HTTP_200_OK)
 
 
 @app.route('/inventory/products/<int:id>', methods=['GET'])
 def get_one_product(id):
-  """ Get info about a specific product
+    """ Get info about a specific product
 
-    This method will get the info about an item with it's product id
+      This method will get the info about an item with it's product id
 
-    Args:
-      id (int): The id of the product to be update
+      Args:
+        id (int): The id of the product to be update
 
-    Returns:
-      response: product id information(product id, location id, used/new/open_box, total_quantity, restock_level)
-      status 200 if succeeded
-      or no product found with status 404 if cannot found the product
+      Returns:
+        response: product id information(product id, location id, used/new/open_box, total_quantity, restock_level)
+        status 200 if succeeded
+        or no product found with status 404 if cannot found the product
 
-    Todo:
-      * Finish the implementations.
-      * Write the tests for this.
-    """
-  product = inventory.get_product(id)
-  if product is not None:
-    return make_response(jsonify(product), HTTP_200_OK)
-  else:
-    return make_response("Product not found", HTTP_404_NOT_FOUND)
-
+      Todo:
+        * Finish the implementations.
+        * Write the tests for this.
+      """
+    product = inventory.get_product(id)
+    if product is not None:
+        return make_response(jsonify(product), HTTP_200_OK)
+    else:
+        return make_response("Product not found", HTTP_404_NOT_FOUND)
 
 
 @app.route('/inventory/products/<int:id>/add', methods=['PUT'])
 def add_to_product(id):
-  """ add certain amount to product
+    """ add certain amount to product
 
-  This method will add certain amount to product in the inventory
-  (eg. certain amount in new, open box or used.)
+    This method will add certain amount to product in the inventory
+    (eg. certain amount in new, open box or used.)
 
-  Args:
-    id (int): The id of the product to be added to
+    Args:
+      id (int): The id of the product to be added to
 
-  Returns:
-    response: add successful message with status 200 if succeeded
-              or no product found with status 404 if cannot found the product
-              or invalid update with status 400 if the update violates any limitation.
+    Returns:
+      response: add successful message with status 200 if succeeded
+                or no product found with status 404 if cannot found the product
+                or invalid update with status 400 if the update violates any limitation.
 
-  Todo:
-    * Finish the implementations.
-    * Write the tests for this.
+    Todo:
+      * Finish the implementations.
+      * Write the tests for this.
 
-  """
-  product = inventory.get_product(id)
-  if product is not None:
-      info = request.get_json()
-      if is_valid(info):
-         inventory.put_product(id, info)
-      else:
-          make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
-      return make_response(product.__str__(), HTTP_200_OK)
-  else:
-      return make_response("Product not found", HTTP_404_NOT_FOUND)
+    """
+    data = inventory.get_product(id)
+    if data is not None:
+        info = request.get_json()
+        if is_valid(info):
+            total = data['used'] + data['new'] + data['open_box']
+            if info['type'] is 'used':
+                if total + info['quantity'] <= data['restock_level']:
+                    data = {'product_id': id, 'location_id': data['location_id'],
+                            'used': data['used'] + info['quantity'], 'new': data['new'],
+                            'open_box': data['open_box'], 'restock_level': data['restock_level']}
+                    inventory.put_product(id, data)
+                else:
+                    return make_response("Product amount over restock_level", HTTP_400_BAD_REQUEST)
 
+            if info['type'] is 'new':
+                if total + info['quantity'] <= data['restock_level']:
+                    data = {'product_id': id, 'location_id': data['location_id'],
+                            'used': data['used'], 'new': data['new'] + info['quantity'],
+                            'open_box': data['open_box'], 'restock_level': data['restock_level']}
+                    inventory.put_product(id, data)
+                else:
+                    return make_response("Product amount over restock_level", HTTP_400_BAD_REQUEST)
+
+            if info['type'] is 'open_box':
+                if total + info['quantity'] <= data['restock_level']:
+                    data = {'product_id': id, 'location_id': data['location_id'],
+                            'used': data['used'], 'new': data['new'], 'open_box': data['open_box'] + info['quantity'],
+                            'restock_level': data['restock_level']}
+                    inventory.put_product(id, data)
+                else:
+                    return make_response("Product amount over restock_level", HTTP_400_BAD_REQUEST)
+
+        else:
+            make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
+
+        return make_response(data.__str__(), HTTP_200_OK)
+
+    else:
+        return make_response("Product not found", HTTP_404_NOT_FOUND)
 
 
 @app.route('/inventory/products/<int:id>/remove', methods=['PUT'])
 def remove_from_product(id):
-  """ remove certain amount from product
+    """ remove certain amount from product
 
-  This method will remove certain amount from product
-  (eg. amount in new, open box or used.)
+    This method will remove certain amount from product
+    (eg. amount in new, open box or used.)
 
-  Args:
-    id (int): The id of the product to be removed from
+    Args:
+      id (int): The id of the product to be removed from
 
-  Returns:
-    response: remove successful message with status 200 if succeeded
-              or no product found with status 404 if cannot found the product
-              or invalid update with status 400 if the update violates any limitation.
+    Returns:
+      response: remove successful message with status 200 if succeeded
+                or no product found with status 404 if cannot found the product
+                or invalid update with status 400 if the update violates any limitation.
 
-  Todo:
-    * Finish the implementations.
-    * Write the tests for this.
+    Todo:
+      * Finish the implementations.
+      * Write the tests for this.
 
-  """
-  pass
+    """
+    data = inventory.get_product(id)
+    if data is not None:
+        info = request.get_json()
+        if is_valid(info):
+            total = data['used'] + data['new'] + data['open_box']
+            if info['type'] is 'used':
+                if data['used'] - info['quantity'] >= 0:
+                    data = {'product_id': id, 'location_id': data['location_id'],
+                            'used': data['used'] - info['quantity'], 'new': data['new'],
+                            'open_box': data['open_box'], 'restock_level': data['restock_level']}
+                    inventory.put_product(id, data)
+                else:
+                    return make_response("No so many products", HTTP_400_BAD_REQUEST)
+
+            if info['type'] is 'new':
+                if data['new'] - info['quantity'] >= 0:
+                    data = {'product_id': id, 'location_id': data['location_id'],
+                            'used': data['used'], 'new': data['new'] - info['quantity'],
+                            'open_box': data['open_box'], 'restock_level': data['restock_level']}
+                    inventory.put_product(id, data)
+                else:
+                    return make_response("No so many products", HTTP_400_BAD_REQUEST)
+
+            if info['type'] is 'open_box':
+                if data['open_box'] - info['quantity'] >= 0:
+                    data = {'product_id': id, 'location_id': data['location_id'],
+                            'used': data['used'], 'new': data['new'], 'open_box': data['open_box'] - info['quantity'],
+                            'restock_level': data['restock_level']}
+                    inventory.put_product(id, data)
+                else:
+                    return make_response("No so many products", HTTP_400_BAD_REQUEST)
+
+        else:
+            make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
+
+        return make_response(data.__str__(), HTTP_200_OK)
+
+    else:
+        return make_response("Product not found", HTTP_404_NOT_FOUND)
+
 
 @app.route('/inventory/products/<int:id>', methods=['DELETE'])
 def delete_product(id):
-  """
-    This method will delete an existing product from inventory
-    or simply will do nothing if it does not exist.
+    """
+      This method will delete an existing product from inventory
+      or simply will do nothing if it does not exist.
 
-    Args:
-      id (int): The id of the product to be deleted
+      Args:
+        id (int): The id of the product to be deleted
 
-    Returns:
-      response: Delete successful message with status 204 if product exist and is deleted
-                or no product found with status 404 if product does not exist
+      Returns:
+        response: Delete successful message with status 204 if product exist and is deleted
+                  or no product found with status 404 if product does not exist
 
-    Todo:
-     * Finish the implementation
-     * Write test cases
+      Todo:
+       * Finish the implementation
+       * Write test cases
 
- """
-  result = inventory.delete_product(id);
-  if result is True:
-      return make_response('', HTTP_204_NO_CONTENT)
-  else:
-      message = {'error' : 'product %s was not found' % id}
-      rc = HTTP_404_NOT_FOUND
-      return make_response(jsonify(message), rc)
+   """
+    result = inventory.delete_product(id);
+    if result is True:
+        return make_response('', HTTP_204_NO_CONTENT)
+    else:
+        message = {'error': 'product %s was not found' % id}
+        rc = HTTP_404_NOT_FOUND
+        return make_response(jsonify(message), rc)
 
 
-@app.route('/inventory/products/', methods= ['POST'])
+@app.route('/inventory/products/', methods=['POST'])
 def create_products():
     """
 
@@ -189,6 +256,7 @@ def create_products():
     """
     pass
 
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -197,12 +265,13 @@ def is_valid(info):
     valid = False
     try:
         product_id = info['product_id']
-        location_id = info['location_id']
-        used = info['used']
-        new = info['new']
-        open_box = info['open_box']
-        restock_level = info['restock_level']
+        type = info['type']
+        quantity = info['quantity']
         valid = True
+        if quantity < 0:
+            valid = False
+        if type is not ('used' or 'new' or 'open_box'):
+            valid = False
     except KeyError as err:
         app.logger.warn('Missing parameter error: %s', err)
     except TypeError as err:
