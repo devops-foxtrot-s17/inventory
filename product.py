@@ -1,43 +1,38 @@
+PRODUCT_ID = 'product_id'
+LOCATION_ID = 'location_id'
+USED = 'used'
+NEW = 'new'
+OPEN_BOX = 'open_box'
+RESTOCK_LEVEL = 'restock_level'
+
 
 class Product:
+  def __init__(self, data):
+    check_product_id(data[PRODUCT_ID])
+    self.data = {PRODUCT_ID: int(data[PRODUCT_ID]),
+                 LOCATION_ID: check_location_id(data),
+                 USED: check_int_value(data, USED),
+                 NEW: check_int_value(data, NEW),
+                 OPEN_BOX: check_int_value(data, OPEN_BOX),
+                 RESTOCK_LEVEL: check_int_value(data, RESTOCK_LEVEL)}
 
-    def __init__(self, product_id, location_id, used, new, open_box, restock_level):
 
-        if product_id is None:
-            raise AttributeError('ID can not be empty!')
-        elif type(product_id) is not int:
-            raise AttributeError('ID must be integer!')
-        else:
-            self.product_id = int(product_id)
+def check_product_id(value):
+  if value is None:
+    raise AttributeError('ID can not be empty!')
+  elif type(value) is not int:
+    raise AttributeError('ID must be integer!')
 
-        if location_id is None or location_id is not int:
-            self.location_id = 0
-        else:
-            self.location_id = int(location_id)
 
-        if used is None or used is not int:
-            self.used = 0
-        else:
-            self.used = int(used)
+def check_location_id(data):
+  if LOCATION_ID not in data or type(data[LOCATION_ID]) is not int:
+    return 0
+  else:
+    return int(data[LOCATION_ID])
 
-        if new is None or new is not int:
-            self.new = 0
-        else:
-            self.new = int(new)
 
-        if open_box is None or open_box is not int:
-            self.open_box = 0
-        else:
-            self.open_box = int(open_box)
-
-        if restock_level is None or restock_level is not int:
-            self.restock_level = 0
-        else:
-            self.restock_level = int(restock_level)
-
-    # To have a nice explanatory version when the product is printed
-    def __str__(self):
-        return 'Product id: ' + str(self.product_id) + ', location: ' + str(self.location_id) + ', # used: ' + \
-               str(self.used) + ', # new: ' + str(self.new) + ', # open box: ' + str(self.open_box) + \
-                ', # total: ' + str(self.used + self.new + self.open_box) + ', restock at: ' + str(self.restock_level)
-
+def check_int_value(data, key):
+  if key not in data or type(data[key]) is not int:
+    return 0
+  else:
+    return int(data[key])

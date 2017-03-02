@@ -5,7 +5,7 @@
 """
 
 from base_inventory import BaseInventory
-from product import Product
+from product import Product, PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RESTOCK_LEVEL
 
 
 class DictInventory(BaseInventory):
@@ -18,7 +18,7 @@ class DictInventory(BaseInventory):
 
   def get_product(self, product_id):
     if product_id in self.products:
-      return self.products[product_id]
+      return self.products[product_id].data
     else:
       return None
 
@@ -26,13 +26,13 @@ class DictInventory(BaseInventory):
   def get_all(self):
     result = {}
     for k in self.products:
-      result[k] = self.products[k].__str__()
+      result[k] = self.products[k].data
     return result
 
 
   def put_product(self, id, info):
-    self.products[id] = Product(id, info['location_id'], info['used'],
-                                info['new'], info['open_box'], info['restock_level'])
+    info[PRODUCT_ID] = id
+    self.products[id] = Product(info)
     return True
 
 
@@ -44,5 +44,7 @@ class DictInventory(BaseInventory):
       raise KeyError('No product with product id %d' % product_id)
 
   def test_init(self):
-    self.products[1] = Product(1,1,1,1,1,4)
-    self.products[2] = Product(2,2,2,2,2,7)
+    self.products[1] = Product({PRODUCT_ID: 1, LOCATION_ID: 1,
+                                USED: 1,NEW: 1, OPEN_BOX: 1, RESTOCK_LEVEL: 11})
+    self.products[2] = Product({PRODUCT_ID: 2, LOCATION_ID: 2,
+                                USED: 2,NEW: 2, OPEN_BOX: 2, RESTOCK_LEVEL: 22})

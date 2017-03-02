@@ -80,7 +80,7 @@ def get_one_product(id):
     """
   product = inventory.get_product(id)
   if product is not None:
-    return make_response(product.__str__(), HTTP_200_OK)
+    return make_response(jsonify(product), HTTP_200_OK)
   else:
     return make_response("Product not found", HTTP_404_NOT_FOUND)
 
@@ -218,5 +218,5 @@ def is_valid(info):
 if __name__ == "__main__":
     # Pull options from environment
     debug = (os.getenv('DEBUG', 'False') == 'True')
-    port = os.getenv('PORT', '5000')
+    port = os.getenv('PORT', '5001')
     app.run(host='0.0.0.0', port=int(port), debug=debug)
