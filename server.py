@@ -151,18 +151,22 @@ def delete_product(id):
       id (int): The id of the product to be deleted
 
     Returns:
-      response: Delete successful message with status 200 if product exist and is deleted
+      response: Delete successful message with status 204 if product exist and is deleted
                 or no product found with status 404 if product does not exist
-                or invalid update with status 400 if the amount in inventory is less than
-                amount to be deleted
 
     Todo:
      * Finish the implementation
      * Write test cases
 
-  """
+ """
+  result = inventory.delete_product(id);
+  if result is True:
+      return make_response('', HTTP_204_NO_CONTENT)
+  else:
+      message = {'error' : 'product %s was not found' % id}
+      rc = HTTP_404_NOT_FOUND
+      return make_response(jsonify(message), rc)
 
-  pass
 
 @app.route('/inventory/products/', methods= ['POST'])
 def create_products():
