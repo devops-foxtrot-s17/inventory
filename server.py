@@ -35,6 +35,7 @@ def index():
                              "To see all products, please access /inventory/products"}
   return make_response(jsonify(welcome_info), HTTP_200_OK)
 
+
 @app.route('/inventory/products', methods=['GET'])
 def get_product_list():
   """ Get info about all products
@@ -66,7 +67,6 @@ def get_one_product(id):
     return make_response(jsonify(product), HTTP_200_OK)
   else:
     return make_response("Product not found", HTTP_404_NOT_FOUND)
-
 
 
 @app.route('/inventory/products/<int:id>/update', methods=['PUT'])
@@ -170,6 +170,7 @@ def create_products():
                                               RESTOCK_LEVEL: data[RESTOCK_LEVEL]})
         return make_response(jsonify(inventory.get_product(product_id)), HTTP_201_CREATED)
     return make_response('No restock level provided or illegal restock level value', HTTP_400_BAD_REQUEST)
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
