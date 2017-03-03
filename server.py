@@ -2,9 +2,8 @@ import logging
 import os
 
 from flask import Flask, jsonify, make_response, request
-from product import RESTOCK_LEVEL, LOCATION_ID, RESTOCK_LEVEL
-
 from dict_inventory import DictInventory
+from product import PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RESTOCK_LEVEL
 
 app = Flask(__name__)
 app.config['LOGGING_LEVEL'] = logging.INFO
@@ -17,6 +16,9 @@ HTTP_400_BAD_REQUEST = 400
 HTTP_404_NOT_FOUND = 404
 HTTP_409_CONFLICT = 409
 
+# infomation constants
+TYPE = 'type'
+QUANTITY = 'quantity'
 
 inventory = DictInventory()
 
@@ -87,8 +89,8 @@ def get_one_product(id):
 
 
 
-@app.route('/inventory/products/<int:id>/add', methods=['PUT'])
-def add_to_product(id):
+@app.route('/inventory/products/<int:id>/update', methods=['PUT'])
+def update_to_product(id):
   """ add certain amount to product
 
   This method will add certain amount to product in the inventory
@@ -107,22 +109,54 @@ def add_to_product(id):
     * Write the tests for this.
 
   """
-  product = inventory.get_product(id)
-  if product is not None:
-      info = request.get_json()
-      if is_valid(info):
-         inventory.put_product(id, info)
-      else:
-          make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
-      return make_response(product.__str__(), HTTP_200_OK)
+  data = inventory.get_product(id)
+  if data is not None:
+    info = request.get_json()
+    if is_valid(info):
+      total = data[USED] + data[NEW] + data[OPEN_BOX]
+
+      if info[TYPE] is USED:
+        if (total + info[QUANTITY] <= data[RESTOCK_LEVEL]) and (data[USED] + info[QUANTITY] >= 0):
+          data[USED] += info[QUANTITY]
+          inventory.put_product(id, data)
+        else:
+          if total + info[QUANTITY] > data[RESTOCK_LEVEL]:
+            make_response("Product amount exceed ", HTTP_400_BAD_REQUEST)
+          else:
+            make_response("Product amount below zero", HTTP_400_BAD_REQUEST)
+
+      if info[TYPE] is NEW:
+        if (total + info[QUANTITY] <= data[RESTOCK_LEVEL]) and (data[NEW] + info[QUANTITY] >= 0):
+          data[NEW] += info[QUANTITY]
+          inventory.put_product(id, data)
+        else:
+          if total + info[QUANTITY] > data[RESTOCK_LEVEL]:
+            make_response("Product amount exceed ", HTTP_400_BAD_REQUEST)
+          else:
+            make_response("Product amount below zero", HTTP_400_BAD_REQUEST)
+
+      if info[TYPE] is OPEN_BOX:
+        if (total + info[QUANTITY] <= data[RESTOCK_LEVEL]) and (data[OPEN_BOX] + info[QUANTITY] >= 0):
+          data[OPEN_BOX] += info[QUANTITY]
+          inventory.put_product(id, data)
+        else:
+          if total + info[QUANTITY] > data[RESTOCK_LEVEL]:
+            make_response("Product amount exceed ", HTTP_400_BAD_REQUEST)
+          else:
+            make_response("Product amount below zero", HTTP_400_BAD_REQUEST)
+
+    else:
+      make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
+
+    return make_response(data.__str__(), HTTP_200_OK)
   else:
       return make_response("Product not found", HTTP_404_NOT_FOUND)
 
 
-
+"""
 @app.route('/inventory/products/<int:id>/remove', methods=['PUT'])
 def remove_from_product(id):
-  """ remove certain amount from product
+  remove certain amount from product
 
   This method will remove certain amount from product
   (eg. amount in new, open box or used.)
@@ -139,8 +173,9 @@ def remove_from_product(id):
     * Finish the implementations.
     * Write the tests for this.
 
-  """
+
   pass
+"""
 
 @app.route('/inventory/products/<int:id>', methods=['DELETE'])
 def delete_product(id):
@@ -204,13 +239,14 @@ def create_products():
 def is_valid(info):
     valid = False
     try:
-        product_id = info['product_id']
-        location_id = info['location_id']
-        used = info['used']
-        new = info['new']
-        open_box = info['open_box']
-        restock_level = info['restock_level']
+        product_id = info[PRODUCT_ID]
+        type = info[TYPE]
+        quantity = info[QUANTITY]
         valid = True
+        if not isinstance(quantity, int):
+          valid = False
+        if type is not ('used' or 'new' or 'open_box'):
+          valid = False
     except KeyError as err:
         app.logger.warn('Missing parameter error: %s', err)
     except TypeError as err:
