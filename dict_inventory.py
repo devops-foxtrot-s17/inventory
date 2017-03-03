@@ -13,6 +13,8 @@ class DictInventory(BaseInventory):
   def __init__(self):
     BaseInventory.__init__(self)
     self.products = {}
+    self.next_product_id = 0
+    self.next_location_id = 0
     self.test_init()
 
 
@@ -44,7 +46,17 @@ class DictInventory(BaseInventory):
       raise KeyError('No product with product id %d' % product_id)
 
   def test_init(self):
-    self.products[1] = Product({PRODUCT_ID: 1, LOCATION_ID: 1,
+    self.products[0] = Product({PRODUCT_ID: self.get_next_product_id(),
+                                LOCATION_ID: self.get_next_location_id(),
                                 USED: 1,NEW: 1, OPEN_BOX: 1, RESTOCK_LEVEL: 11})
-    self.products[2] = Product({PRODUCT_ID: 2, LOCATION_ID: 2,
+    self.products[1] = Product({PRODUCT_ID: self.get_next_product_id(),
+                                LOCATION_ID: self.get_next_location_id(),
                                 USED: 2,NEW: 2, OPEN_BOX: 2, RESTOCK_LEVEL: 22})
+
+  def get_next_product_id(self):
+    self.next_product_id += 1
+    return self.next_product_id - 1
+
+  def get_next_location_id(self):
+    self.next_location_id += 1
+    return self.next_location_id - 1
