@@ -2,6 +2,7 @@ import logging
 import os
 
 from flask import Flask, jsonify, make_response, request
+from product import RESTOCK_LEVEL, LOCATION_ID, RESTOCK_LEVEL
 
 from dict_inventory import DictInventory
 
@@ -168,26 +169,33 @@ def delete_product(id):
       return make_response(jsonify(message), rc)
 
 
-@app.route('/inventory/products/', methods= ['POST'])
+@app.route('/inventory/products', methods= ['POST'])
 def create_products():
     """
 
     This method will create a storage for a new product
 
-    Args:
+    Args: data with restock_level provided.
 
     Returns:
 
-      response: create successful message with status 201 if succeeded, the auto assigned product id should also be presented
-                or invalid update with status 400 if the create request violates any limitation
-                or conflict update with status 409 there is a identical product already in the data.
+      response: create successful message with status 201 if succeeded,
+                the auto assigned product id and location id should also be presented
+                or invalid create with status 400 if the create request violates any limitation
 
     Todo:
       * Finish the implementations.
       * Write the tests for this.
 
     """
-    pass
+    data = request.get_json()
+    if RESTOCK_LEVEL in data and type(data[RESTOCK_LEVEL]) is int and data[RESTOCK_LEVEL] > 0:
+        product_id = inventory.get_next_product_id()
+        location_id = inventory.get_next_location_id()
+        inventory.put_product(product_id,info={LOCATION_ID: location_id,
+                                              RESTOCK_LEVEL: data[RESTOCK_LEVEL]})
+        return make_response(jsonify(inventory.get_product(product_id)), HTTP_201_CREATED)
+    return make_response('No restock level provided or illegal restock level value', HTTP_400_BAD_REQUEST)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
