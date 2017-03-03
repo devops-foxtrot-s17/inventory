@@ -148,34 +148,10 @@ def update_to_product(id):
     else:
       make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
 
-    return make_response(data.__str__(), HTTP_200_OK)
+    return make_response(jsonify(data), HTTP_200_OK)
   else:
       return make_response("Product not found", HTTP_404_NOT_FOUND)
 
-
-"""
-@app.route('/inventory/products/<int:id>/remove', methods=['PUT'])
-def remove_from_product(id):
-  remove certain amount from product
-
-  This method will remove certain amount from product
-  (eg. amount in new, open box or used.)
-
-  Args:
-    id (int): The id of the product to be removed from
-
-  Returns:
-    response: remove successful message with status 200 if succeeded
-              or no product found with status 404 if cannot found the product
-              or invalid update with status 400 if the update violates any limitation.
-
-  Todo:
-    * Finish the implementations.
-    * Write the tests for this.
-
-
-  pass
-"""
 
 @app.route('/inventory/products/<int:id>', methods=['DELETE'])
 def delete_product(id):
