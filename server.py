@@ -16,7 +16,7 @@ HTTP_400_BAD_REQUEST = 400
 HTTP_404_NOT_FOUND = 404
 HTTP_409_CONFLICT = 409
 
-# infomation constants
+# information constants
 TYPE = 'type'
 QUANTITY = 'quantity'
 
@@ -25,16 +25,10 @@ inventory = DictInventory()
 @app.route('/inventory')
 def index():
   """ Intro page of the inventory API
-
   This method will only return some welcome words.
 
   Returns:
     response: welcome words in json format and status 200
-
-  Todo:
-    * Finish the implementations.
-    * Write the tests for this.
-
   """
   welcome_info = {'api': "inventory",
                   'message': "This is the index page of /inventory. "
@@ -44,20 +38,11 @@ def index():
 @app.route('/inventory/products', methods=['GET'])
 def get_product_list():
   """ Get info about all products
-
     This method will get the info about all the products
-
-    Args:
-      no arguments
 
     Returns:
       response: product information(product id, location id, used/new/open_box, total_quantity, restock_level)
       status 200 if succeeded
-
-    Todo:
-      * Finish the implementations.
-      * Write the tests for this.
-
   """
   all_products = inventory.get_all()
   return make_response(jsonify(all_products), HTTP_200_OK)
@@ -66,7 +51,6 @@ def get_product_list():
 @app.route('/inventory/products/<int:id>', methods=['GET'])
 def get_one_product(id):
   """ Get info about a specific product
-
     This method will get the info about an item with it's product id
 
     Args:
@@ -76,10 +60,6 @@ def get_one_product(id):
       response: product id information(product id, location id, used/new/open_box, total_quantity, restock_level)
       status 200 if succeeded
       or no product found with status 404 if cannot found the product
-
-    Todo:
-      * Finish the implementations.
-      * Write the tests for this.
     """
   product = inventory.get_product(id)
   if product is not None:
@@ -92,7 +72,6 @@ def get_one_product(id):
 @app.route('/inventory/products/<int:id>/update', methods=['PUT'])
 def update_to_product(id):
   """ add certain amount to product
-
   This method will add certain amount to product in the inventory
   (eg. certain amount in new, open box or used.)
 
@@ -103,11 +82,6 @@ def update_to_product(id):
     response: add successful message with status 200 if succeeded
               or no product found with status 404 if cannot found the product
               or invalid update with status 400 if the update violates any limitation.
-
-  Todo:
-    * Finish the implementations.
-    * Write the tests for this.
-
   """
   data = inventory.get_product(id)
   if data is not None:
@@ -155,7 +129,7 @@ def update_to_product(id):
 
 @app.route('/inventory/products/<int:id>', methods=['DELETE'])
 def delete_product(id):
-  """
+  """ delete a product by id
     This method will delete an existing product from inventory
     or simply will do nothing if it does not exist.
 
@@ -165,11 +139,6 @@ def delete_product(id):
     Returns:
       response: Delete successful message with status 204 if product exist and is deleted
                 or no product found with status 404 if product does not exist
-
-    Todo:
-     * Finish the implementation
-     * Write test cases
-
  """
   result = inventory.delete_product(id);
   if result is True:
@@ -182,8 +151,7 @@ def delete_product(id):
 
 @app.route('/inventory/products', methods= ['POST'])
 def create_products():
-    """
-
+    """ create a product with restock level.
     This method will create a storage for a new product
 
     Args: data with restock_level provided.
@@ -193,11 +161,6 @@ def create_products():
       response: create successful message with status 201 if succeeded,
                 the auto assigned product id and location id should also be presented
                 or invalid create with status 400 if the create request violates any limitation
-
-    Todo:
-      * Finish the implementations.
-      * Write the tests for this.
-
     """
     data = request.get_json()
     if RESTOCK_LEVEL in data and type(data[RESTOCK_LEVEL]) is int and data[RESTOCK_LEVEL] > 0:
