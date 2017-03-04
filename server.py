@@ -114,6 +114,7 @@ def delete_product(id):
 
     Args:
       id (int): The id of the product to be deleted
+      data: {type: [used|new|open_box], quantity: [quantity]}
 
     Returns:
       response: Delete successful message with status 204 if product exist and is deleted
