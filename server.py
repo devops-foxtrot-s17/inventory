@@ -77,6 +77,7 @@ def update_to_product(id):
 
   Args:
     id (int): The id of the product to be added to
+    data: {type: [used|new|open_box], quantity: [quantity]}
 
   Returns:
     response: add successful message with status 200 if succeeded
@@ -114,7 +115,6 @@ def delete_product(id):
 
     Args:
       id (int): The id of the product to be deleted
-      data: {type: [used|new|open_box], quantity: [quantity]}
 
     Returns:
       response: Delete successful message with status 204 if product exist and is deleted
