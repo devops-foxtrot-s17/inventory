@@ -179,13 +179,12 @@ def create_products():
 def is_valid(info):
     valid = False
     try:
-        product_id = info[PRODUCT_ID]
         type = info[TYPE]
         quantity = info[QUANTITY]
         valid = True
         if not isinstance(quantity, int):
           valid = False
-        if type is not ('used' or 'new' or 'open_box'):
+        if type not in ['used', 'new', 'open_box']:
           valid = False
     except KeyError as err:
         app.logger.warn('Missing parameter error: %s', err)
