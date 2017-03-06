@@ -69,7 +69,7 @@ def get_one_product(id):
     return make_response("Product not found", HTTP_404_NOT_FOUND)
 
 
-@app.route('/inventory/products/<int:id>/update', methods=['PUT'])
+@app.route('/inventory/products/<int:id>', methods=['PUT'])
 def update_to_product(id):
   """ add certain amount to product
   This method will add certain amount to product in the inventory
@@ -77,6 +77,7 @@ def update_to_product(id):
 
   Args:
     id (int): The id of the product to be added to
+    data: {type: [used|new|open_box], quantity: [quantity]}
 
   Returns:
     response: add successful message with status 200 if succeeded
@@ -84,47 +85,26 @@ def update_to_product(id):
               or invalid update with status 400 if the update violates any limitation.
   """
   data = inventory.get_product(id)
-  if data is not None:
-    info = request.get_json()
-    if is_valid(info):
-      total = data[USED] + data[NEW] + data[OPEN_BOX]
+  info = request.get_json()
+  total = data[USED] + data[NEW] + data[OPEN_BOX]
+  prod_type = info[TYPE]
 
-      if info[TYPE] is USED:
-        if (total + info[QUANTITY] <= data[RESTOCK_LEVEL]) and (data[USED] + info[QUANTITY] >= 0):
-          data[USED] += info[QUANTITY]
-          inventory.put_product(id, data)
-        else:
-          if total + info[QUANTITY] > data[RESTOCK_LEVEL]:
-            make_response("Product amount exceed ", HTTP_400_BAD_REQUEST)
-          else:
-            make_response("Product amount below zero", HTTP_400_BAD_REQUEST)
+  if data is None:
+    return make_response("Product not found", HTTP_404_NOT_FOUND)
 
-      if info[TYPE] is NEW:
-        if (total + info[QUANTITY] <= data[RESTOCK_LEVEL]) and (data[NEW] + info[QUANTITY] >= 0):
-          data[NEW] += info[QUANTITY]
-          inventory.put_product(id, data)
-        else:
-          if total + info[QUANTITY] > data[RESTOCK_LEVEL]:
-            make_response("Product amount exceed ", HTTP_400_BAD_REQUEST)
-          else:
-            make_response("Product amount below zero", HTTP_400_BAD_REQUEST)
+  elif not is_valid(info):
+    return make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
 
-      if info[TYPE] is OPEN_BOX:
-        if (total + info[QUANTITY] <= data[RESTOCK_LEVEL]) and (data[OPEN_BOX] + info[QUANTITY] >= 0):
-          data[OPEN_BOX] += info[QUANTITY]
-          inventory.put_product(id, data)
-        else:
-          if total + info[QUANTITY] > data[RESTOCK_LEVEL]:
-            make_response("Product amount exceed ", HTTP_400_BAD_REQUEST)
-          else:
-            make_response("Product amount below zero", HTTP_400_BAD_REQUEST)
+  elif total + info[QUANTITY] > data[RESTOCK_LEVEL]:
+    return make_response("Product amount exceed restock level", HTTP_400_BAD_REQUEST)
 
-    else:
-      make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
+  elif data[prod_type] + info[QUANTITY] < 0:
+    return make_response("Product amount below zero", HTTP_400_BAD_REQUEST)
 
-    return make_response(jsonify(data), HTTP_200_OK)
   else:
-      return make_response("Product not found", HTTP_404_NOT_FOUND)
+    data[prod_type] += info[QUANTITY]
+    inventory.put_product(id, data)
+    return make_response(jsonify(data), HTTP_200_OK)
 
 
 @app.route('/inventory/products/<int:id>', methods=['DELETE'])
