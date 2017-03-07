@@ -6,7 +6,7 @@
 # User-specific stuff:
 .idea/**/workspace.xml
 .idea/**/tasks.xml
-
+.vagrant/*
 # Sensitive or high-churn files:
 .idea/**/dataSources/
 .idea/**/dataSources.ids
@@ -71,3 +71,4 @@ Temporary Items
 .apdisk
 
 .idea/
+/.vagrant/machines/default/virtualbox/action_provision
