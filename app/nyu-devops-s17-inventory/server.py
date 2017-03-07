@@ -2,7 +2,7 @@ import logging
 import os
 
 from flask import Flask, jsonify, make_response, request
-from dict_inventory import DictInventory
+from redis_inventory import RedisInventory
 from product import PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RESTOCK_LEVEL
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ HTTP_409_CONFLICT = 409
 TYPE = 'type'
 QUANTITY = 'quantity'
 
-inventory = DictInventory()
+inventory = RedisInventory(app)
 
 @app.route('/inventory')
 def index():
@@ -181,5 +181,5 @@ def is_valid(info):
 if __name__ == "__main__":
     # Pull options from environment
     debug = (os.getenv('DEBUG', 'False') == 'True')
-    port = os.getenv('PORT', '5001')
+    port = os.getenv('PORT', '5000')
     app.run(host='0.0.0.0', port=int(port), debug=debug)
