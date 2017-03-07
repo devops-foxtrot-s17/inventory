@@ -67,7 +67,7 @@ Vagrant.configure(2) do |config|
     rm cf-cli-installer_6.24.0_x86-64.deb
     # Install app dependencies
     cd /vagrant
-    sudo pip install -r app/nyu-devops-s17-inventory/equirements.txt
+    sudo pip install -r ./app/nyu-devops-s17-inventory/requirements.txt
   SHELL
 
   ######################################################################
