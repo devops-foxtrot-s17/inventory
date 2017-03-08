@@ -22,8 +22,12 @@ QUANTITY = 'quantity'
 
 inventory = RedisInventory(app)
 
-@app.route('/inventory')
+@app.route('/')
 def index():
+    return app.send_static_file('index.html')
+
+@app.route('/inventory')
+def inventory_index():
   """ Intro page of the inventory API
   This method will only return some welcome words.
 
