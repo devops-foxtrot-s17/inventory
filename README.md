@@ -1,17 +1,17 @@
 # inventory
 Inventory keeps track of how many products in warehouse.
 
-##### This service provides APIs:
+### This service provides APIs:
 - listing all products
 - get single product with id
 - update quantity of a product
 - create(allocate) the space for new product
 - delete a product with id
 
-##### For detailed usage guide and full service, goto:
+### For detailed usage guide and full service, go to:
 -  https://nyu-devops-s17-inventory.mybluemix.net
 
-##### To play with it locally
+### To play with it locally
 - clone the repo
 - go to the directory: ```cd inventory```
 - set up the virtual machine: ```vagrant up```
