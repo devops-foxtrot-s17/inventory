@@ -62,15 +62,17 @@ class RedisInventory(BaseInventory):
       self.redis.delete(product_id)
       return True
     else:
-      raise KeyError('No product with product id %d' % product_id)
+      return False
 
 
   def test_init(self):
-    pid = self.__next_index()
+    if len(self.redis.keys()) > 1: # first one is index.
+      return
+    pid = self.get_next_product_id()
     self.put_product(pid, {PRODUCT_ID: pid,
                                 LOCATION_ID: self.get_next_location_id(),
                                 USED: 1,NEW: 1, OPEN_BOX: 1, RESTOCK_LEVEL: 11})
-    pid =  self.__next_index()
+    pid =  self.get_next_product_id()
     self.put_product(pid,{PRODUCT_ID: pid,
                                 LOCATION_ID: self.get_next_location_id(),
                                 USED: 2,NEW: 2, OPEN_BOX: 2, RESTOCK_LEVEL: 22})
@@ -79,7 +81,7 @@ class RedisInventory(BaseInventory):
 ##################################################################
 # helper methods to get ids.
 ##################################################################
-  def __next_index(self):
+  def get_next_product_id(self):
     self.redis.incr('index')
     index = self.redis.get('index')
     return index
