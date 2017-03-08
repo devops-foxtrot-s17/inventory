@@ -86,8 +86,9 @@ def update_to_product(id):
   """
   data = inventory.get_product(id)
   info = request.get_json()
-  total = data[USED] + data[NEW] + data[OPEN_BOX]
+  total = int(data[USED]) + int(data[NEW]) + int(data[OPEN_BOX])
   prod_type = info[TYPE]
+  current_amount = int(data[prod_type])
 
   if data is None:
     return make_response("Product not found", HTTP_404_NOT_FOUND)
@@ -95,14 +96,14 @@ def update_to_product(id):
   elif not is_valid(info):
     return make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
 
-  elif total + info[QUANTITY] > data[RESTOCK_LEVEL]:
+  elif total + info[QUANTITY] > int(data[RESTOCK_LEVEL]):
     return make_response("Product amount exceed restock level", HTTP_400_BAD_REQUEST)
 
-  elif data[prod_type] + info[QUANTITY] < 0:
+  elif current_amount + info[QUANTITY] < 0:
     return make_response("Product amount below zero", HTTP_400_BAD_REQUEST)
 
   else:
-    data[prod_type] += info[QUANTITY]
+    data[prod_type] = current_amount + info[QUANTITY]
     inventory.put_product(id, data)
     return make_response(jsonify(data), HTTP_200_OK)
 
@@ -147,7 +148,10 @@ def create_products():
         product_id = inventory.get_next_product_id()
         location_id = inventory.get_next_location_id()
         inventory.put_product(product_id,info={LOCATION_ID: location_id,
-                                              RESTOCK_LEVEL: data[RESTOCK_LEVEL]})
+                                               NEW:0,
+                                               USED:0,
+                                               OPEN_BOX:0,
+                                               RESTOCK_LEVEL: data[RESTOCK_LEVEL]})
         return make_response(jsonify(inventory.get_product(product_id)), HTTP_201_CREATED)
     return make_response('No restock level provided or illegal restock level value', HTTP_400_BAD_REQUEST)
 
