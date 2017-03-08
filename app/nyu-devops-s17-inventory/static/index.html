@@ -20,11 +20,12 @@
         <br><br>
         GET /inventory/products/{id} retrieves a product from the DB using an ID.
         <br><br>
-        PUT /inventory/products/{id} updates a product using an ID.
+        PUT /inventory/products/{id} with payload of "type" and "quantity" adds/removes the number of products from the specific type (i.e. open-box, new or used) of the product with the given ID. 
         <br><br>
         DELETE /inventory/products/{id} removes a product from the DB using an ID.
         <br><br>
-        POST /inventory/products creates an new product.
+        POST /inventory/products with the payload "restock_level" creates a new product with the given storage.
+
                 <p>Example Data:</p>
                 <pre>
     {
