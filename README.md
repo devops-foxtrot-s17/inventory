@@ -19,3 +19,9 @@ Inventory keeps track of how many products in warehouse.
 - go to the mirror directory of inventory ```cd /vagrant```
 - start the server: ```python app/nyu-devops-s17-inventory/server.py```
 - go to ```http://0.0.0.0:5000/``` on your local machine.
+
+To stop the vm:
+- use ```vagrant halt```
+
+To delete the vm:
+- use ```vagrant destroy```
