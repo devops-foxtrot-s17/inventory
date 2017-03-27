@@ -76,7 +76,7 @@ def get_one_product(id):
 @app.route('/inventory/products/<int:id>', methods=['PUT'])
 def update_to_product(id):
   """ change product quantity to certain amount
-  This method will product change product quantity to certain amount in the inventory
+  This method will change product quantity to certain amount in the inventory
   (eg. certain amount in new, open box or used.)
 
   Args:
