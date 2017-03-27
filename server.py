@@ -75,8 +75,8 @@ def get_one_product(id):
 
 @app.route('/inventory/products/<int:id>', methods=['PUT'])
 def update_to_product(id):
-  """ add certain amount to product
-  This method will add certain amount to product in the inventory
+  """ change product quantity to certain amount
+  This method will product change product quantity to certain amount in the inventory
   (eg. certain amount in new, open box or used.)
 
   Args:
@@ -92,7 +92,6 @@ def update_to_product(id):
   info = request.get_json()
   total = int(data[USED]) + int(data[NEW]) + int(data[OPEN_BOX])
   prod_type = info[TYPE]
-  current_amount = int(data[prod_type])
 
   if data is None:
     return make_response("Product not found", HTTP_404_NOT_FOUND)
@@ -100,14 +99,14 @@ def update_to_product(id):
   elif not is_valid(info):
     return make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
 
-  elif total + info[QUANTITY] > int(data[RESTOCK_LEVEL]):
+  elif total - data[QUANTITY] + info[QUANTITY] > int(data[RESTOCK_LEVEL]):
     return make_response("Product amount exceed restock level", HTTP_400_BAD_REQUEST)
 
-  elif current_amount + info[QUANTITY] < 0:
+  elif info[QUANTITY] < 0:
     return make_response("Product amount below zero", HTTP_400_BAD_REQUEST)
 
   else:
-    data[prod_type] = current_amount + info[QUANTITY]
+    data[prod_type] = info[QUANTITY]
     inventory.put_product(id, data)
     return make_response(jsonify(data), HTTP_200_OK)
 
@@ -125,13 +124,8 @@ def delete_product(id):
       response: Delete successful message with status 204 if product exist and is deleted
                 or no product found with status 404 if product does not exist
  """
-  result = inventory.delete_product(id);
-  if result is True:
-      return make_response('', HTTP_204_NO_CONTENT)
-  else:
-      message = {'error' : 'product %s was not found' % id}
-      rc = HTTP_404_NOT_FOUND
-      return make_response(jsonify(message), rc)
+  inventory.delete_product(id)
+  return make_response('', HTTP_204_NO_CONTENT)
 
 
 @app.route('/inventory/products', methods= ['POST'])
