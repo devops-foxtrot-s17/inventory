@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import Flask, jsonify, make_response, request
+from flask import Flask, jsonify, make_response, request, url_for
 from redis_inventory import RedisInventory
 from product import PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RESTOCK_LEVEL
 
@@ -156,8 +156,11 @@ def create_products():
                                                USED:0,
                                                OPEN_BOX:0,
                                                RESTOCK_LEVEL: data[RESTOCK_LEVEL]})
-        return make_response(jsonify(inventory.get_product(product_id)), HTTP_201_CREATED)
-    return make_response('No restock level provided or illegal restock level value', HTTP_400_BAD_REQUEST)
+        response =  make_response(jsonify(inventory.get_product(product_id)), HTTP_201_CREATED)
+        response.headers['Location'] = url_for('get_one_product', id=product_id)
+    else:
+        response = make_response('No restock level provided or illegal restock level value', HTTP_400_BAD_REQUEST)
+    return response
 
 
 ######################################################################
