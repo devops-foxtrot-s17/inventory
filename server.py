@@ -99,7 +99,7 @@ def update_to_product(id):
   elif not is_valid(info):
     return make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
 
-  elif total - data[QUANTITY] + info[QUANTITY] > int(data[RESTOCK_LEVEL]):
+  elif total - data[prod_type] + info[QUANTITY] > int(data[RESTOCK_LEVEL]):
     return make_response("Product amount exceed restock level", HTTP_400_BAD_REQUEST)
 
   elif info[QUANTITY] < 0:
