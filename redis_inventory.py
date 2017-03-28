@@ -60,11 +60,8 @@ class RedisInventory(BaseInventory):
   def delete_product(self, product_id):
     if self.redis.exists(product_id):
       self.redis.delete(product_id)
-      return True
-    else:
-      return False
-
-
+    
+    
   def test_init(self):
     if len(self.redis.keys()) > 1: # first one is index.
       return
