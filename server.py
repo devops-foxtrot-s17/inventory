@@ -1,7 +1,10 @@
 import logging
 import os
 
-from flask import Flask, jsonify, make_response, request, url_for
+from flask import Flask, jsonify, make_response, request, url_for, json
+from redis import Redis
+from redis.exceptions import ConnectionError
+
 from redis_inventory import RedisInventory
 from product import PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RESTOCK_LEVEL
 
@@ -20,7 +23,7 @@ HTTP_409_CONFLICT = 409
 TYPE = 'type'
 QUANTITY = 'quantity'
 
-inventory = RedisInventory(app)
+inventory = None
 
 @app.route('/')
 def index():
@@ -178,7 +181,43 @@ def is_valid(info):
 
     return valid
 
+######################################################################
+# Connect to Redis and catch connection exceptions#
+# This method will work in the following conditions:
+#   1) In Bluemix with Redis bound through VCAP_SERVICES
+#   2) With Redis running on the local server as with Travis CI
+#   3) With Redis --link ed in a Docker container called 'redis'
+######################################################################
+def init_redis_client():
+  redis = None
+  # Get the crdentials from the Bluemix environment
+  if 'VCAP_SERVICES' in os.environ:
+    app.logger.info("Using VCAP_SERVICES...")
+    VCAP_SERVICES = os.environ['VCAP_SERVICES']
+    services = json.loads(VCAP_SERVICES)
+    creds = services['rediscloud'][0]['credentials']
+    app.logger.info("Conecting to Redis on host %s port %s" % (creds['hostname'], creds['port']))
+    redis = connect_to_redis(creds['hostname'], creds['port'], creds['password'])
+  else:
+    app.logger.info("VCAP_SERVICES not found, checking localhost for Redis")
+    redis = connect_to_redis('127.0.0.1', 6379, None)
+    if not redis:
+      app.logger.info("No Redis on localhost, using: redis")
+      redis = connect_to_redis('redis', 6379, None)
 
+  if not redis:
+    # if you end up here, redis instance is down.
+    app.logger.error('*** FATAL ERROR: Could not connect to the Redis Service')
+    exit(1)
+  return redis
+
+def connect_to_redis(hostname, port, password):
+    redis = Redis(host=hostname, port=port, password=password)
+    try:
+        redis.ping()
+    except ConnectionError:
+        redis = None
+    return redis
 ######################################################################
 #   M A I N
 ######################################################################
@@ -187,4 +226,6 @@ if __name__ == "__main__":
     # Pull options from environment
     debug = (os.getenv('DEBUG', 'False') == 'True')
     port = os.getenv('PORT', '5000')
+    redis = init_redis_client()
+    inventory = RedisInventory(redis)
     app.run(host='0.0.0.0', port=int(port), debug=debug)
