@@ -5,34 +5,14 @@
 """
 import os
 from flask import json
-from redis import Redis
-from redis.exceptions import ConnectionError
 from base_inventory import BaseInventory
 from product import PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RESTOCK_LEVEL
 
 class RedisInventory(BaseInventory):
 
-  def __init__(self,app):
+  def __init__(self, redis):
     BaseInventory.__init__(self)
-    if 'VCAP_SERVICES' in os.environ:
-      app.logger.info("Using VCAP_SERVICES...")
-      VCAP_SERVICES = os.environ['VCAP_SERVICES']
-      services = json.loads(VCAP_SERVICES)
-      creds = services['rediscloud'][0]['credentials']
-      app.logger.info("Conecting to Redis on host %s port %s" % (creds['hostname'], creds['port']))
-      self.redis = connect_to_redis(creds['hostname'], creds['port'], creds['password'])
-    else:
-      app.logger.info("VCAP_SERVICES not found, checking localhost for Redis")
-      self.redis = connect_to_redis('127.0.0.1', 6379, None)
-      if not self.redis:
-        app.logger.info("No Redis on localhost, using: redis")
-        self.redis = connect_to_redis('redis', 6379, None)
-
-    if not self.redis:
-      # if you end up here, redis instance is down.
-      app.logger.error('*** FATAL ERROR: Could not connect to the Redis Service')
-      exit(1)
-
+    self.redis = redis
     self.next_location_id = 0
     self.test_init()
 
@@ -87,15 +67,3 @@ class RedisInventory(BaseInventory):
   def get_next_location_id(self):
     self.next_location_id += 1
     return self.next_location_id - 1
-
-
-######################################################################
-# Connect to Redis and catch connection exceptions
-######################################################################
-def connect_to_redis(hostname, port, password):
-    redis = Redis(host=hostname, port=port, password=password)
-    try:
-        redis.ping()
-    except ConnectionError:
-        redis = None
-    return redis
