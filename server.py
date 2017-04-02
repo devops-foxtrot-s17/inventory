@@ -166,9 +166,14 @@ def get_products_with_type():
   arg = request.args.get('type')
   
   if arg is None or not arg:
-    response = make_response('Invalid argument, need the type of product ', HTTP_400_BAD_REQUEST)
+    response = make_response('Invalid argument, need the type of product as one of the fields: open_box, new, used', HTTP_400_BAD_REQUEST)
     return response
-  
+  arg = arg.lower()
+
+  if arg != OPEN_BOX and arg != NEW and arg != USED:
+    response = make_response('Invalid type, must be one of these fields: open_box, new, used', HTTP_400_BAD_REQUEST)
+    return response
+
   for product in inventory.get_all():
     if arg in product and int(product[arg]) > 0:
       l.append(product)
