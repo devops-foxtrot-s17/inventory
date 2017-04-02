@@ -17,6 +17,7 @@ class RedisInventory(BaseInventory):
     self.test_init()
 
 
+
   def get_product(self, product_id):
     if self.redis.exists(product_id):
       return self.redis.hgetall(product_id)
@@ -25,10 +26,10 @@ class RedisInventory(BaseInventory):
 
 
   def get_all(self):
-    result = {}
+    result = []
     for key in self.redis.keys():
       if key != 'index':  # filer out our id index
-        result[key] = self.redis.hgetall(key)
+        result.append(self.redis.hgetall(key))
     return result
 
 
@@ -53,6 +54,11 @@ class RedisInventory(BaseInventory):
     self.put_product(pid,{PRODUCT_ID: pid,
                                 LOCATION_ID: self.get_next_location_id(),
                                 USED: 2,NEW: 2, OPEN_BOX: 2, RESTOCK_LEVEL: 22})
+    pid = self.get_next_product_id()
+    self.put_product(pid,{PRODUCT_ID: pid,
+                                LOCATION_ID: self.get_next_location_id(),
+                                USED: 0,NEW: 5, OPEN_BOX: 3, RESTOCK_LEVEL: 10})
+
 
 
 ##################################################################
