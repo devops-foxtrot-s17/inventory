@@ -6,7 +6,15 @@
 import os
 from flask import json
 from base_inventory import BaseInventory
-from product import PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RESTOCK_LEVEL
+
+PRODUCT_ID = 'product_id'
+LOCATION_ID = 'location_id'
+USED = 'used'
+NEW = 'new'
+OPEN_BOX = 'open_box'
+RESTOCK_LEVEL = 'restock_level'
+TYPE = 'type'
+QUANTITY = 'quantity'
 
 class RedisInventory(BaseInventory):
 
