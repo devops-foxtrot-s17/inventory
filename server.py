@@ -147,7 +147,9 @@ def create_products():
                                                NEW:0,
                                                USED:0,
                                                OPEN_BOX:0,
-                                               RESTOCK_LEVEL: data[RESTOCK_LEVEL]})
+                                               RESTOCK_LEVEL: data[RESTOCK_LEVEL],
+                                               PRODUCT_ID: product_id
+                                               })
         response =  make_response(jsonify(inventory.get_product(product_id)), HTTP_201_CREATED)
         response.headers['Location'] = url_for('get_one_product', id=product_id)
     else:
