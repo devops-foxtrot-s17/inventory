@@ -1,14 +1,8 @@
-import logging
-import os
+from flask import jsonify, make_response, request, url_for
 
-from flask import Flask, jsonify, make_response, request, url_for, json
-from redis import Redis
-from redis.exceptions import ConnectionError
-
-from redis_inventory import RedisInventory, PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RESTOCK_LEVEL, TYPE, QUANTITY
-
-app = Flask(__name__)
-app.config['LOGGING_LEVEL'] = logging.INFO
+import utils
+from redis_inventory import LOCATION_ID, NEW, OPEN_BOX, PRODUCT_ID, QUANTITY, RESTOCK_LEVEL, TYPE, USED
+from . import app
 
 # Status Codes
 HTTP_200_OK = 200
@@ -20,9 +14,11 @@ HTTP_409_CONFLICT = 409
 
 inventory = None
 
+
 @app.route('/')
 def index():
-    return app.send_static_file('index.html')
+  return app.send_static_file('index.html')
+
 
 @app.route('/inventory')
 def inventory_index():
@@ -94,7 +90,7 @@ def update_product(id):
   if data is None:
     return make_response("Product not found", HTTP_404_NOT_FOUND)
 
-  elif not is_valid(info):
+  elif not utils.is_valid(info):
     return make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
 
   elif total - data[prod_type] + info[QUANTITY] > int(data[RESTOCK_LEVEL]):
@@ -126,44 +122,52 @@ def delete_product(id):
   return make_response('', HTTP_204_NO_CONTENT)
 
 
-@app.route('/inventory/products', methods= ['POST'])
+@app.route('/inventory/products', methods=['POST'])
 def create_products():
-    """ create a product with restock level.
-    This method will create a storage for a new product
+  """ create a product with restock level.
+  This method will create a storage for a new product
 
-    Args: data with restock_level provided.
+  Args: data with restock_level provided.
 
-    Returns:
+  Returns:
 
-      response: create successful message with status 201 if succeeded,
-                the auto assigned product id and location id should also be presented
-                or invalid create with status 400 if the create request violates any limitation
-    """
-    data = request.get_json()
-    if RESTOCK_LEVEL in data and type(data[RESTOCK_LEVEL]) is int and data[RESTOCK_LEVEL] > 0:
-        product_id = inventory.get_next_product_id()
-        location_id = inventory.get_next_location_id()
-        inventory.put_product(product_id,info={LOCATION_ID: location_id,
-                                               NEW:0,
-                                               USED:0,
-                                               OPEN_BOX:0,
-                                               RESTOCK_LEVEL: data[RESTOCK_LEVEL],
-                                               PRODUCT_ID: product_id
-                                               })
-        response =  make_response(jsonify(inventory.get_product(product_id)), HTTP_201_CREATED)
-        response.headers['Location'] = url_for('get_one_product', id=product_id)
-    else:
-        response = make_response('No restock level provided or illegal restock level value', HTTP_400_BAD_REQUEST)
-    return response
+    response: create successful message with status 201 if succeeded,
+              the auto assigned product id and location id should also be presented
+              or invalid create with status 400 if the create request violates any limitation
+  """
+  data = request.get_json()
+  if RESTOCK_LEVEL in data and type(data[RESTOCK_LEVEL]) is int and data[RESTOCK_LEVEL] > 0:
+    product_id = inventory.get_next_product_id()
+    location_id = inventory.get_next_location_id()
+    inventory.put_product(product_id, info={LOCATION_ID: location_id,
+                                            NEW: 0,
+                                            USED: 0,
+                                            OPEN_BOX: 0,
+                                            RESTOCK_LEVEL: data[RESTOCK_LEVEL],
+                                            PRODUCT_ID: product_id
+                                            })
+    response = make_response(jsonify(inventory.get_product(product_id)), HTTP_201_CREATED)
+    response.headers['Location'] = url_for('get_one_product', id=product_id)
+  else:
+    response = make_response('No restock level provided or illegal restock level value', HTTP_400_BAD_REQUEST)
+  return response
 
 
-@app.route('/inventory/product', methods = ['GET'])
+@app.route('/inventory/product', methods=['GET'])
 def get_products_with_type():
+  """ Gets products with quantity of type larger than 0
+
+
+  Returns:
+    response: add successful message with status 200 if succeeded
+              or no type provided or found 400 bad request.
+  """
   l = []
   arg = request.args.get('type')
-  
+
   if arg is None or not arg:
-    response = make_response('Invalid argument, need the type of product as one of the fields: open_box, new, used', HTTP_400_BAD_REQUEST)
+    response = make_response('Invalid argument, need the type of product as one of the fields: open_box, new, used',
+                             HTTP_400_BAD_REQUEST)
     return response
   arg = arg.lower()
 
@@ -199,73 +203,3 @@ def clear_storage(id):
 
     inventory.put_product(id, data)
     return make_response(jsonify(data), HTTP_200_OK)
-
-######################################################################
-#  U T I L I T Y   F U N C T I O N S
-######################################################################
-
-def is_valid(info):
-    valid = False
-    try:
-        type = info[TYPE]
-        quantity = info[QUANTITY]
-        valid = True
-        if not isinstance(quantity, int):
-          valid = False
-        if type not in ['used', 'new', 'open_box']:
-          valid = False
-    except KeyError as err:
-        app.logger.warn('Missing parameter error: %s', err)
-    except TypeError as err:
-        app.logger.warn('Invalid Content Type error: %s', err)
-
-    return valid
-
-######################################################################
-# Connect to Redis and catch connection exceptions#
-# This method will work in the following conditions:
-#   1) In Bluemix with Redis bound through VCAP_SERVICES
-#   2) With Redis running on the local server as with Travis CI
-#   3) With Redis --link ed in a Docker container called 'redis'
-######################################################################
-def init_redis_client():
-  redis = None
-  # Get the crdentials from the Bluemix environment
-  if 'VCAP_SERVICES' in os.environ:
-    app.logger.info("Using VCAP_SERVICES...")
-    VCAP_SERVICES = os.environ['VCAP_SERVICES']
-    services = json.loads(VCAP_SERVICES)
-    creds = services['rediscloud'][0]['credentials']
-    app.logger.info("Conecting to Redis on host %s port %s" % (creds['hostname'], creds['port']))
-    redis = connect_to_redis(creds['hostname'], creds['port'], creds['password'])
-  else:
-    app.logger.info("VCAP_SERVICES not found, checking localhost for Redis")
-    redis = connect_to_redis('127.0.0.1', 6379, None)
-    if not redis:
-      app.logger.info("No Redis on localhost, using: redis")
-      redis = connect_to_redis('redis', 6379, None)
-
-  if not redis:
-    # if you end up here, redis instance is down.
-    app.logger.error('*** FATAL ERROR: Could not connect to the Redis Service')
-    exit(1)
-  return redis
-
-def connect_to_redis(hostname, port, password):
-    redis = Redis(host=hostname, port=port, password=password)
-    try:
-        redis.ping()
-    except ConnectionError:
-        redis = None
-    return redis
-######################################################################
-#   M A I N
-######################################################################
-
-if __name__ == "__main__":
-    # Pull options from environment
-    debug = (os.getenv('DEBUG', 'False') == 'True')
-    port = os.getenv('PORT', '5000')
-    redis = init_redis_client()
-    inventory = RedisInventory(redis)
-    app.run(host='0.0.0.0', port=int(port), debug=debug)

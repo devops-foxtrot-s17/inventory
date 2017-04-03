@@ -17,7 +17,7 @@ Inventory keeps track of how many products in warehouse.
 - set up the virtual machine: ```vagrant up```
 - ssh into the virtual machine ```vagrant ssh```
 - go to the mirror directory of inventory ```cd /vagrant```
-- start the server: ```python server.py```
+- start the server: ```python run.py```
 - go to ```http://0.0.0.0:5000/``` on your local machine.
 
 To stop the vm:
