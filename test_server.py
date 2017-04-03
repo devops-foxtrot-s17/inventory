@@ -37,20 +37,20 @@ class TestInventoryServer(unittest.TestCase):
 
 
   def test_delete_product(self):
-  	resp = self.app.get('/inventory/products')
-  	initial_products = json.loads(resp.data)
-  	init_count = self.get_product_count()
-  	
-  	for product in initial_products:
-  		resp = self.app.delete('/inventory/products/'+product['product_id'], content_type='application/json')
-  		self.assertEqual(resp.status_code, server.HTTP_204_NO_CONTENT)
-  		self.assertEqual(len(resp.data), 0)
-  		current_count = self.get_product_count()
-  		self.assertEqual(current_count, init_count - 1)
-  		init_count -= 1
+    resp = self.app.get('/inventory/products')
+    initial_products = json.loads(resp.data)
+    init_count = self.get_product_count()
 
-  	final_count = self.get_product_count()
-  	self.assertEqual( final_count, 0)
+    for product in initial_products:
+      resp = self.app.delete('/inventory/products/'+product['product_id'], content_type='application/json')
+      self.assertEqual(resp.status_code, server.HTTP_204_NO_CONTENT)
+      self.assertEqual(len(resp.data), 0)
+      current_count = self.get_product_count()
+      self.assertEqual(current_count, init_count - 1)
+      init_count -= 1
+
+    final_count = self.get_product_count()
+    self.assertEqual( final_count, 0)
     
   def test_product_create(self):
     initial_count = self.get_product_count()
@@ -69,24 +69,36 @@ class TestInventoryServer(unittest.TestCase):
     self.assertIn( new_json, data )
 
   def test_product_create_with_no_data(self):
-  	resp = self.app.post('inventory/products', content_type='application/json')
-  	self.assertEqual( resp.status_code, server.HTTP_400_BAD_REQUEST)
+    resp = self.app.post('inventory/products', content_type='application/json')
+    self.assertEqual( resp.status_code, server.HTTP_400_BAD_REQUEST)
 
   def test_product_create_with_null_data(self):
-  	resp = self.app.post('inventory/products', data=None, content_type='application/json')
-  	self.assertEqual( resp.status_code, server.HTTP_400_BAD_REQUEST)
+    resp = self.app.post('inventory/products', data=None, content_type='application/json')
+    self.assertEqual( resp.status_code, server.HTTP_400_BAD_REQUEST)
 
   def test_product_create_with_fieldless_data(self):
-  	product = {}
-  	data = json.dumps(product)
-  	resp = self.app.post('inventory/products', data=data, content_type='application/json')
-  	self.assertEqual( resp.status_code, server.HTTP_400_BAD_REQUEST)
+    product = {}
+    data = json.dumps(product)
+    resp = self.app.post('inventory/products', data=data, content_type='application/json')
+    self.assertEqual( resp.status_code, server.HTTP_400_BAD_REQUEST)
 
+  def test_list_inventory(self):
+    resp = self.app.get('/inventory/products')
+    self.assertEqual(resp.status_code, server.HTTP_200_OK)
+
+  def test_get_pet(self):
+    resp = self.app.get('/inventory/products')
+    self.assertEqual(resp.status_code, server.HTTP_200_OK)
+    data = json.loads(resp.data)
+    self.assertEqual(int(data[0][RESTOCK_LEVEL].encode("utf-8")), 11)
+
+  def test_get_pet_not_found(self):
+    resp = self.app.get('/inventory/products/0')
+    self.assertEqual(resp.status_code, server.HTTP_404_NOT_FOUND)
 
 ######################################################################
 # Utility functions
 ######################################################################
-
   def get_product_count(self):
     resp = self.app.get('/inventory/products')
     self.assertEqual(resp.status_code, server.HTTP_200_OK )
@@ -98,4 +110,4 @@ class TestInventoryServer(unittest.TestCase):
 #   M A I N
 ######################################################################
 if __name__ == '__main__':
-	unittest.main()
+  unittest.main()
