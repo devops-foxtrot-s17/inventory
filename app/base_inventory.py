@@ -1,8 +1,9 @@
 """ Base inventory class
 
 """
-class BaseInventory:
 
+
+class BaseInventory:
   def __init__(self):
     pass
 
@@ -24,7 +25,6 @@ class BaseInventory:
       a copy of the product list
     """
     pass
-
 
   def put_product(self, id, info):
     """ Put the product in the inventory
