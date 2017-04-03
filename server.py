@@ -72,7 +72,7 @@ def get_one_product(id):
 
 
 @app.route('/inventory/products/<int:id>', methods=['PUT'])
-def update_to_product(id):
+def update_product(id):
   """ change product quantity to certain amount
   This method will change product quantity to certain amount in the inventory
   (eg. certain amount in new, open box or used.)
@@ -176,6 +176,29 @@ def get_products_with_type():
       l.append(product)
   response = make_response(jsonify(l), HTTP_200_OK)
   return response
+
+
+@app.route('/inventory/products/<int:id>/clear', methods=['PUT'])
+def clear_storage(id):
+  """ Clears a product out of inventory
+      (total quantity -> 0)
+  
+  Args:
+    id (int): The id of the product
+  Returns:
+    response: add successful message with status 200 if succeeded
+              or no product found with status 404 if cannot found the product
+  """
+  data = inventory.get_product(id)
+  if data is None:
+    return make_response("Product not found", HTTP_404_NOT_FOUND)
+  else:
+    data[USED] = 0
+    data[NEW] = 0
+    data[OPEN_BOX] = 0
+
+    inventory.put_product(id, data)
+    return make_response(jsonify(data), HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
