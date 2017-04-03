@@ -5,8 +5,7 @@ from flask import Flask, jsonify, make_response, request, url_for, json
 from redis import Redis
 from redis.exceptions import ConnectionError
 
-from redis_inventory import RedisInventory
-from product import PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RESTOCK_LEVEL
+from redis_inventory import RedisInventory, PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RESTOCK_LEVEL, TYPE, QUANTITY
 
 app = Flask(__name__)
 app.config['LOGGING_LEVEL'] = logging.INFO
@@ -18,10 +17,6 @@ HTTP_204_NO_CONTENT = 204
 HTTP_400_BAD_REQUEST = 400
 HTTP_404_NOT_FOUND = 404
 HTTP_409_CONFLICT = 409
-
-# information constants
-TYPE = 'type'
-QUANTITY = 'quantity'
 
 inventory = None
 
@@ -152,7 +147,9 @@ def create_products():
                                                NEW:0,
                                                USED:0,
                                                OPEN_BOX:0,
-                                               RESTOCK_LEVEL: data[RESTOCK_LEVEL]})
+                                               RESTOCK_LEVEL: data[RESTOCK_LEVEL],
+                                               PRODUCT_ID: product_id
+                                               })
         response =  make_response(jsonify(inventory.get_product(product_id)), HTTP_201_CREATED)
         response.headers['Location'] = url_for('get_one_product', id=product_id)
     else:
