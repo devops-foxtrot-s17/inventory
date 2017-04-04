@@ -149,6 +149,38 @@ class TestInventoryServer(unittest.TestCase):
     resp = self.app.put('/inventory/products/' + str(id + 1), data=updated_data, content_type='application/json')
     self.assertEqual(resp.status_code, server.HTTP_404_NOT_FOUND)
 
+  def test_get_products_with_type_in_lowercase(self):
+    self.helper_add_new_product_with_restock_level(20)
+    self.helper_update_product_with_type_and_quantity(NEW, 12)
+
+    id = len(server.inventory.get_all())
+    product = server.inventory.get_product(id)
+
+    resp = self.app.get('/inventory/product?type=new')
+    self.assertEqual(resp.status_code, server.HTTP_200_OK)
+    data = json.loads(resp.data)
+    self.assertIn(product, data)
+
+  def test_get_products_with_type_in_uppercase(self):
+    self.helper_add_new_product_with_restock_level(20)
+    self.helper_update_product_with_type_and_quantity(NEW, 12)
+
+    id = len(server.inventory.get_all())
+    product = server.inventory.get_product(id)
+
+    resp = self.app.get('/inventory/product?type=NEW')
+    self.assertEqual(resp.status_code, server.HTTP_200_OK)
+    data = json.loads(resp.data)
+    self.assertIn(product, data)
+
+  def test_get_products_with_type_invalid_argument_missing_fields(self):
+    resp = self.app.get('/inventory/product?type=')
+    self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
+
+  def test_get_products_with_type_invalid_argument_wrong_key_word(self):
+    resp = self.app.get('/inventory/product?type=python3')
+    self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
+
   ######################################################################
   # Utility functions
   ######################################################################
@@ -158,7 +190,7 @@ class TestInventoryServer(unittest.TestCase):
     data = json.loads(resp.data)
     return len(data)
 
-  def helper_add_new_product_with_restock_level(self,restock_level):
+  def helper_add_new_product_with_restock_level(self, restock_level):
     new_product = {RESTOCK_LEVEL: restock_level}
     data = json.dumps(new_product)
     resp = self.app.post('/inventory/products', data=data, content_type='application/json')
