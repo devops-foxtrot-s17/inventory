@@ -100,7 +100,7 @@ def update_product(id):
   if int(info[QUANTITY]) < 0:
     return make_response("Product amount below zero", HTTP_400_BAD_REQUEST)
 
-  data[prod_type] = info[QUANTITY]
+  data[prod_type] = int(info[QUANTITY])
   inventory.put_product(id, data)
   return make_response(jsonify(data), HTTP_200_OK)
 
@@ -163,7 +163,7 @@ def get_products_with_type():
               or no type provided or found 400 bad request.
   """
   l = []
-  arg = request.args.get('type')
+  arg = request.args.get(TYPE)
 
   if arg is None or not arg:
     response = make_response('Invalid argument, need the type of product as one of the fields: open_box, new, used',
