@@ -84,25 +84,25 @@ def update_product(id):
   """
   data = inventory.get_product(id)
   info = request.get_json()
-  total = int(data[USED]) + int(data[NEW]) + int(data[OPEN_BOX])
-  prod_type = info[TYPE]
 
   if data is None:
     return make_response("Product not found", HTTP_404_NOT_FOUND)
 
-  elif not utils.is_valid(info):
+  if not utils.is_valid(info):
     return make_response("Product data is not valid", HTTP_400_BAD_REQUEST)
 
-  elif total - data[prod_type] + info[QUANTITY] > int(data[RESTOCK_LEVEL]):
+  total = int(data[USED]) + int(data[NEW]) + int(data[OPEN_BOX])
+  prod_type = info[TYPE]
+
+  if total - int(data[prod_type]) + int(info[QUANTITY]) > int(data[RESTOCK_LEVEL]):
     return make_response("Product amount exceed restock level", HTTP_400_BAD_REQUEST)
 
-  elif info[QUANTITY] < 0:
+  if int(info[QUANTITY]) < 0:
     return make_response("Product amount below zero", HTTP_400_BAD_REQUEST)
 
-  else:
-    data[prod_type] = info[QUANTITY]
-    inventory.put_product(id, data)
-    return make_response(jsonify(data), HTTP_200_OK)
+  data[prod_type] = int(info[QUANTITY])
+  inventory.put_product(id, data)
+  return make_response(jsonify(data), HTTP_200_OK)
 
 
 @app.route('/inventory/products/<int:id>', methods=['DELETE'])
@@ -163,7 +163,7 @@ def get_products_with_type():
               or no type provided or found 400 bad request.
   """
   l = []
-  arg = request.args.get('type')
+  arg = request.args.get(TYPE)
 
   if arg is None or not arg:
     response = make_response('Invalid argument, need the type of product as one of the fields: open_box, new, used',
@@ -186,7 +186,7 @@ def get_products_with_type():
 def clear_storage(id):
   """ Clears a product out of inventory
       (total quantity -> 0)
-  
+
   Args:
     id (int): The id of the product
   Returns:
