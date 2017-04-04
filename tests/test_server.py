@@ -95,6 +95,42 @@ class TestInventoryServer(unittest.TestCase):
     resp = self.app.get('/inventory/products/0')
     self.assertEqual(resp.status_code, server.HTTP_404_NOT_FOUND)
 
+  def test_update_product(self):
+    ## Add new stuff and update
+    new_product = {RESTOCK_LEVEL: 20}
+    data = json.dumps(new_product)
+    resp = self.app.post('/inventory/products', data=data, content_type='application/json')
+    self.assertEqual(resp.status_code, server.HTTP_201_CREATED)
+    updated_product = {TYPE: OPEN_BOX, QUANTITY: 12}
+    updated_data = json.dumps(updated_product)
+    id = len(server.inventory.get_all())
+    resp = self.app.put('/inventory/products/' + str(id), data=updated_data, content_type='application/json')
+    self.assertEqual(resp.status_code, server.HTTP_200_OK)
+    ## Update with exceeding quantity
+    updated_product = {TYPE: OPEN_BOX, QUANTITY: 40}
+    updated_data = json.dumps(updated_product)
+    resp = self.app.put('/inventory/products/' + str(id), data=updated_data, content_type='application/json')
+    self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
+    ## Update with negative quantity
+    updated_product = {TYPE: OPEN_BOX, QUANTITY: -1}
+    updated_data = json.dumps(updated_product)
+    resp = self.app.put('/inventory/products/' + str(id), data=updated_data, content_type='application/json')
+    self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
+    ## Update with invalid data(missing fields)
+    updated_product = {TYPE: OPEN_BOX, QUANTITY: -1}
+    updated_data = json.dumps(updated_product)
+    resp = self.app.put('/inventory/products/' + str(id), data=json.dumps(updated_data),
+                        content_type='application/json')
+    self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
+    ## Update with invalid data(mal-formatted)
+    updated_product = {TYPE: OPEN_BOX, QUANTITY: 'NO'}
+    updated_data = json.dumps(updated_product)
+    resp = self.app.put('/inventory/products/' + str(id), data=json.dumps({}), content_type='application/json')
+    self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
+    ## Update with nonexsisting data
+    resp = self.app.put('/inventory/products/' + str(id + 1), data=updated_data, content_type='application/json')
+    self.assertEqual(resp.status_code, server.HTTP_404_NOT_FOUND)
+
   ######################################################################
   # Utility functions
   ######################################################################
