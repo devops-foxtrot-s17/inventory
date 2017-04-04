@@ -1,7 +1,7 @@
 import os
 
 from app import app, server, utils
-from redis_inventory import RedisInventory
+from app.redis_inventory import RedisInventory
 
 debug = (os.getenv('DEBUG', 'False') == 'True')
 port = os.getenv('PORT', '5001')
