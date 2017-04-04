@@ -95,26 +95,13 @@ class TestInventoryServer(unittest.TestCase):
     resp = self.app.get('/inventory/products/0')
     self.assertEqual(resp.status_code, server.HTTP_404_NOT_FOUND)
 
-  def helper_add_new_product(self):
-    new_product = {RESTOCK_LEVEL: 20}
-    data = json.dumps(new_product)
-    resp = self.app.post('/inventory/products', data=data, content_type='application/json')
-    return self.assertEqual(resp.status_code, server.HTTP_201_CREATED)
-
-  def helper_update_product_with_quantity(self, quantity):
-    updated_product = {TYPE: OPEN_BOX, QUANTITY: quantity}
-    updated_data = json.dumps(updated_product)
-    id = len(server.inventory.get_all())
-    resp = self.app.put('/inventory/products/' + str(id), data=updated_data, content_type='application/json')
-    return self.assertEqual(resp.status_code, server.HTTP_200_OK)
-
   def test_update_product(self):
-    self.helper_add_new_product()
-    return self.helper_update_product_with_quantity(12)
+    self.helper_add_new_product_with_restock_level(20)
+    return self.helper_update_product_with_type_and_quantity(OPEN_BOX, 12)
 
   def test_update_product_with_exceeding_quantity(self):
-    self.helper_add_new_product()
-    self.helper_update_product_with_quantity(12)
+    self.helper_add_new_product_with_restock_level(20)
+    self.helper_update_product_with_type_and_quantity(OPEN_BOX, 12)
 
     id = len(server.inventory.get_all())
 
@@ -124,8 +111,8 @@ class TestInventoryServer(unittest.TestCase):
     self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
 
   def test_update_product_with_negative_quantity(self):
-    self.helper_add_new_product()
-    self.helper_update_product_with_quantity(12)
+    self.helper_add_new_product_with_restock_level(20)
+    self.helper_update_product_with_type_and_quantity(OPEN_BOX, 12)
 
     id = len(server.inventory.get_all())
 
@@ -135,8 +122,8 @@ class TestInventoryServer(unittest.TestCase):
     self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
 
   def test_update_product_with_invalid_data_with_missing_field(self):
-    self.helper_add_new_product()
-    self.helper_update_product_with_quantity(12)
+    self.helper_add_new_product_with_restock_level(20)
+    self.helper_update_product_with_type_and_quantity(OPEN_BOX, 12)
 
     id = len(server.inventory.get_all())
 
@@ -144,8 +131,8 @@ class TestInventoryServer(unittest.TestCase):
     self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
 
   def test_update_product_with_invalid_data_with_wrong_format(self):
-    self.helper_add_new_product()
-    self.helper_update_product_with_quantity(12)
+    self.helper_add_new_product_with_restock_level(20)
+    self.helper_update_product_with_type_and_quantity(OPEN_BOX, 12)
 
     id = len(server.inventory.get_all())
 
@@ -170,6 +157,19 @@ class TestInventoryServer(unittest.TestCase):
     self.assertEqual(resp.status_code, server.HTTP_200_OK)
     data = json.loads(resp.data)
     return len(data)
+
+  def helper_add_new_product_with_restock_level(self,restock_level):
+    new_product = {RESTOCK_LEVEL: restock_level}
+    data = json.dumps(new_product)
+    resp = self.app.post('/inventory/products', data=data, content_type='application/json')
+    return self.assertEqual(resp.status_code, server.HTTP_201_CREATED)
+
+  def helper_update_product_with_type_and_quantity(self, type, quantity):
+    updated_product = {TYPE: type, QUANTITY: quantity}
+    updated_data = json.dumps(updated_product)
+    id = len(server.inventory.get_all())
+    resp = self.app.put('/inventory/products/' + str(id), data=updated_data, content_type='application/json')
+    return self.assertEqual(resp.status_code, server.HTTP_200_OK)
 
 
 ######################################################################
