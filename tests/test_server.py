@@ -181,6 +181,21 @@ class TestInventoryServer(unittest.TestCase):
     resp = self.app.get('/inventory/product?type=python3')
     self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
 
+  def test_clear_storage(self):
+    self.helper_add_new_product_with_restock_level(20)
+    self.helper_update_product_with_type_and_quantity(NEW, 10)
+    self.helper_update_product_with_type_and_quantity(OPEN_BOX, 10)
+
+    id = len(server.inventory.get_all())
+    self.app.put('/inventory/products/' + str(id) + '/clear')
+    product = server.inventory.get_product(id)
+    self.assertTrue(int(product[NEW]) == 0 and int(product[USED]) == 0 and int(product[OPEN_BOX]) == 0)
+
+  def test_clear_storage_not_found(self):
+    id = len(server.inventory.get_all())
+    resp = self.app.put('/inventory/products/' + str(id + 1) + '/clear')
+    self.assertEqual(resp.status_code, server.HTTP_404_NOT_FOUND)
+
   ######################################################################
   # Utility functions
   ######################################################################
