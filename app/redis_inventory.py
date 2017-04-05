@@ -44,20 +44,19 @@ class RedisInventory(BaseInventory):
       self.redis.delete(product_id)
 
   def test_init(self):
-    if len(self.redis.keys()) > 1:  # first one is index.
-      return
-    pid = self.get_next_product_id()
-    self.put_product(pid, {PRODUCT_ID: pid,
-                           LOCATION_ID: self.get_next_location_id(),
-                           USED: 1, NEW: 1, OPEN_BOX: 1, RESTOCK_LEVEL: 11})
-    pid = self.get_next_product_id()
-    self.put_product(pid, {PRODUCT_ID: pid,
-                           LOCATION_ID: self.get_next_location_id(),
-                           USED: 2, NEW: 2, OPEN_BOX: 2, RESTOCK_LEVEL: 22})
-    pid = self.get_next_product_id()
-    self.put_product(pid, {PRODUCT_ID: pid,
-                           LOCATION_ID: self.get_next_location_id(),
-                           USED: 0, NEW: 5, OPEN_BOX: 3, RESTOCK_LEVEL: 10})
+    if len(self.redis.keys()) <= 1:  # first one is index.
+      pid = self.get_next_product_id()
+      self.put_product(pid, {PRODUCT_ID: pid,
+                            LOCATION_ID: self.get_next_location_id(),
+                            USED: 1, NEW: 1, OPEN_BOX: 1, RESTOCK_LEVEL: 11})
+      pid = self.get_next_product_id()
+      self.put_product(pid, {PRODUCT_ID: pid,
+                            LOCATION_ID: self.get_next_location_id(),
+                            USED: 2, NEW: 2, OPEN_BOX: 2, RESTOCK_LEVEL: 22})
+      pid = self.get_next_product_id()
+      self.put_product(pid, {PRODUCT_ID: pid,
+                            LOCATION_ID: self.get_next_location_id(),
+                            USED: 0, NEW: 5, OPEN_BOX: 3, RESTOCK_LEVEL: 10})
 
   ##################################################################
   # helper methods to get ids.

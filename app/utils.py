@@ -1,7 +1,7 @@
 import os
 
 from flask import json
-from redis import Redis, ConnectionError
+from redis import Redis, ConnectionError, RedisError
 
 import server
 from . import app
@@ -51,7 +51,7 @@ def init_redis_client():
   if not redis:
     # if you end up here, redis instance is down.
     app.logger.error('*** FATAL ERROR: Could not connect to the Redis Service')
-    exit(1)
+    raise RedisError
   return redis
 
 

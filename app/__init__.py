@@ -8,3 +8,7 @@ app = Flask(__name__)
 # Load Configurations
 # app.config.from_object('config')
 app.config['LOGGING_LEVEL'] = logging.INFO
+
+import server
+import utils
+import redis_inventory
