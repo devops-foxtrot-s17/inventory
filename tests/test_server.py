@@ -85,11 +85,11 @@ class TestInventoryServer(unittest.TestCase):
     resp = self.app.get('/inventory/products')
     self.assertEqual(resp.status_code, server.HTTP_200_OK)
 
-  def test_get_products(self):
-    resp = self.app.get('/inventory/products')
+  def test_get_product(self):
+    resp = self.app.get('/inventory/products/1')
     self.assertEqual(resp.status_code, server.HTTP_200_OK)
     data = json.loads(resp.data)
-    self.assertEqual(int(data[0][RESTOCK_LEVEL].encode("utf-8")), 11)
+    self.assertEqual(int(data[RESTOCK_LEVEL].encode("utf-8")), 11)
 
   def test_get_product_not_found(self):
     resp = self.app.get('/inventory/products/0')

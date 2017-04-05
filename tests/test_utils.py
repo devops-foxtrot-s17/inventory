@@ -40,8 +40,9 @@ class TestInventoryServer(unittest.TestCase):
     utils.Redis.assert_called_once()
     assert redis is mock_redis_client
 
+  # Don't know why this doesn't work
   def test_fail_connect_to_redis(self):
-    mock_redis_client.ping.side_effect = ConnectionError('Failed connect to redis')
+    mock_redis_client.ping.side_effect = raise_connection_error
     redis = utils.connect_to_redis('', '', '')
     assert redis is None
 
@@ -82,3 +83,6 @@ def side_effect_connect_to_redis(host, port, password):
     return mock_redis_client
   else:
     return None
+
+def raise_connection_error():
+  raise ConnectionError
