@@ -2,12 +2,14 @@ import json
 import os
 import unittest
 
-from mock import Mock, mock
+from mock import Mock
 from mockredis import mock_redis_client
 from redis import ConnectionError, RedisError
 
 from app import utils, server
+from app.redis_inventory import USED
 
+INVALID_TYPE_USED = 'not_used'
 
 class TestInventoryServer(unittest.TestCase):
   def setUp(self):
@@ -16,19 +18,19 @@ class TestInventoryServer(unittest.TestCase):
     utils.connect_to_redis = Mock(side_effect=utils.connect_to_redis)
 
   def test_info_is_valid(self):
-    info = {server.TYPE: 'used', server.QUANTITY: 20}
+    info = {server.TYPE: USED, server.QUANTITY: 20}
     assert utils.is_valid(info) is True
 
   def test_info_is_invalid_for_illegal_type(self):
-    info = {server.TYPE: 'not_used', server.QUANTITY: 20}
+    info = {server.TYPE: INVALID_TYPE_USED, server.QUANTITY: 20}
     assert utils.is_valid(info) is False
 
   def test_info_quantity_not_int(self):
-    info = {server.TYPE: 'not_used', server.QUANTITY: '20'}
+    info = {server.TYPE: USED, server.QUANTITY: '20'}
     assert utils.is_valid(info) is False
 
   def test_info_missing_key(self):
-    info = {server.TYPE: 'not_used'}
+    info = {server.TYPE: USED}
     assert utils.is_valid(info) is False
 
   def test_info_not_dict(self):

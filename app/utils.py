@@ -2,6 +2,7 @@ import os
 
 from flask import json
 from redis import Redis, ConnectionError, RedisError
+from redis_inventory import USED, NEW, OPEN_BOX
 
 import server
 from . import app
@@ -14,7 +15,7 @@ def is_valid(info):
     valid = True
     if not isinstance(quantity, int):
       valid = False
-    if type not in ['used', 'new', 'open_box']:
+    if type not in [USED, NEW, OPEN_BOX]:
       valid = False
   except KeyError as err:
     print('Missing parameter error: %s', err)
