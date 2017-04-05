@@ -4,7 +4,7 @@ from app import app, server, utils
 from app.redis_inventory import RedisInventory
 
 debug = (os.getenv('DEBUG', 'False') == 'True')
-port = os.getenv('PORT', '5001')
+port = os.getenv('PORT', '5000')
 
 if __name__ == "__main__":
   redis = utils.init_redis_client()
