@@ -1,7 +1,8 @@
 import os
 
 from flask import json
-from redis import Redis, ConnectionError
+from redis import Redis, ConnectionError, RedisError
+from redis_inventory import USED, NEW, OPEN_BOX
 
 import server
 from . import app
@@ -14,7 +15,7 @@ def is_valid(info):
     valid = True
     if not isinstance(quantity, int):
       valid = False
-    if type not in ['used', 'new', 'open_box']:
+    if type not in [USED, NEW, OPEN_BOX]:
       valid = False
   except KeyError as err:
     print('Missing parameter error: %s', err)
@@ -51,7 +52,7 @@ def init_redis_client():
   if not redis:
     # if you end up here, redis instance is down.
     app.logger.error('*** FATAL ERROR: Could not connect to the Redis Service')
-    exit(1)
+    raise RedisError
   return redis
 
 

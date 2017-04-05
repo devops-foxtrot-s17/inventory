@@ -16,7 +16,6 @@ class BaseInventory:
     Returns:
       the product info
     """
-    pass
 
   def get_all(self):
     """ Get whole list of product
@@ -24,7 +23,6 @@ class BaseInventory:
     Returns:
       a copy of the product list
     """
-    pass
 
   def put_product(self, id, info):
     """ Put the product in the inventory
@@ -37,7 +35,6 @@ class BaseInventory:
     Returns:
       If put success or not.
     """
-    pass
 
   def delete_product(self, product_id):
     """ Delete the product from the inventory
@@ -48,4 +45,3 @@ class BaseInventory:
     Returns:
       If delete success or not.
     """
-    pass
