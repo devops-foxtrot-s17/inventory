@@ -20,7 +20,6 @@ class RedisInventory(BaseInventory):
     BaseInventory.__init__(self)
     self.redis = redis
     self.next_location_id = 0
-    self.test_init()
 
   def get_product(self, product_id):
     if self.redis.exists(product_id):
@@ -45,21 +44,6 @@ class RedisInventory(BaseInventory):
 
   def reset(self):
     self.redis.flushdb()
-
-  def test_init(self):
-    if len(self.redis.keys()) <= 1:  # first one is index.
-      pid = self.get_next_product_id()
-      self.put_product(pid, {PRODUCT_ID: pid,
-                            LOCATION_ID: self.get_next_location_id(),
-                            USED: 1, NEW: 1, OPEN_BOX: 1, RESTOCK_LEVEL: 11})
-      pid = self.get_next_product_id()
-      self.put_product(pid, {PRODUCT_ID: pid,
-                            LOCATION_ID: self.get_next_location_id(),
-                            USED: 2, NEW: 2, OPEN_BOX: 2, RESTOCK_LEVEL: 22})
-      pid = self.get_next_product_id()
-      self.put_product(pid, {PRODUCT_ID: pid,
-                            LOCATION_ID: self.get_next_location_id(),
-                            USED: 0, NEW: 5, OPEN_BOX: 3, RESTOCK_LEVEL: 10})
 
   ##################################################################
   # helper methods to get ids.
