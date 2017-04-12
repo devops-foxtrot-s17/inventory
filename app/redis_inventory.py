@@ -43,6 +43,9 @@ class RedisInventory(BaseInventory):
     if self.redis.exists(product_id):
       self.redis.delete(product_id)
 
+  def reset(self):
+    self.redis.flushdb()
+
   def test_init(self):
     if len(self.redis.keys()) <= 1:  # first one is index.
       pid = self.get_next_product_id()
