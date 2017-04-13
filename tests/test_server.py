@@ -197,6 +197,10 @@ class TestInventoryServer(unittest.TestCase):
     resp = self.app.put('/inventory/products/' + str(id + 1) + '/clear')
     self.assertEqual(resp.status_code, server.HTTP_404_NOT_FOUND)
 
+  def test_reset(self):
+    server.inventory.reset()
+    self.assertTrue(len(server.inventory.get_all())==0)
+
   ######################################################################
   # Utility functions
   ######################################################################
