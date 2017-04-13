@@ -23,6 +23,7 @@ class TestInventoryServer(unittest.TestCase):
   def setUp(self):
     redis = mock_redis_client()
     server.inventory = RedisInventory(redis)
+    self.generate_data(server.inventory)
     self.app = server.app.test_client()
 
   def test_index(self):
@@ -218,6 +219,22 @@ class TestInventoryServer(unittest.TestCase):
     resp = self.app.put('/inventory/products/' + str(id), data=updated_data, content_type='application/json')
     return self.assertEqual(resp.status_code, server.HTTP_200_OK)
 
+
+  @staticmethod
+  def generate_data(to_inventory):
+    if len(to_inventory.redis.keys()) <= 1:  # first one is index.
+      pid = to_inventory.get_next_product_id()
+      to_inventory.put_product(pid, {PRODUCT_ID: pid,
+                            LOCATION_ID: to_inventory.get_next_location_id(),
+                            USED: 1, NEW: 1, OPEN_BOX: 1, RESTOCK_LEVEL: 11})
+      pid = to_inventory.get_next_product_id()
+      to_inventory.put_product(pid, {PRODUCT_ID: pid,
+                            LOCATION_ID: to_inventory.get_next_location_id(),
+                            USED: 2, NEW: 2, OPEN_BOX: 2, RESTOCK_LEVEL: 22})
+      pid = to_inventory.get_next_product_id()
+      to_inventory.put_product(pid, {PRODUCT_ID: pid,
+                            LOCATION_ID: to_inventory.get_next_location_id(),
+                            USED: 0, NEW: 5, OPEN_BOX: 3, RESTOCK_LEVEL: 10})
 
 ######################################################################
 #   M A I N
