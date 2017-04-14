@@ -17,6 +17,14 @@ def step_impl(context, url):
     assert context.resp.status_code == 200
 
 
+@when(u'I create a product with restock level "{restock_level}"')
+def step_impl(context, restock_level):
+  target_url = '/inventory/products'
+  data = json.dumps({"restock_level": int(restock_level)})
+  context.resp = context.app.post(target_url, data=data, content_type='application/json')
+  assert context.resp.status_code == 201
+
+
 @when(u'I delete "{url}" with id "{id}"')
 def step_impl(context, url, id):
   target_url = '/{}/{}'.format(url, id)
@@ -35,13 +43,13 @@ def step_impl(context, id):
 
 @when(u'I change "{key}" to "{value}"')
 def step_impl(context, key, value):
-  data={TYPE: key, QUANTITY: int(value)}
+  data = {TYPE: key, QUANTITY: int(value)}
   context.resp.data = json.dumps(data)
 
 
 @when(u'I update product with id "{id}"')
 def step_impl(context, id):
-  url='inventory/products'
+  url = 'inventory/products'
   target_url = '/{}/{}'.format(url, id)
   context.resp = context.app.put(target_url, data=context.resp.data, content_type='application/json')
   assert context.resp.status_code == 200
@@ -61,6 +69,12 @@ def step_impl(context, message):
 def step_impl(context, field, val):
   data = str(json.loads(context.resp.data)[field])
   assert data == val
+
+
+@then(u'I should not have "{field}" equals to "{val}"')
+def step_impl(context, field, val):
+  data = str(json.loads(context.resp.data)[field])
+  assert data != val
 
 
 @given(u'the following products')
