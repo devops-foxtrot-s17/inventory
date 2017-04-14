@@ -11,8 +11,13 @@ Feature: The pet store service back-end
       | 31         | 322         | 13   | 23       | 33  | 100           |
 
   Scenario: The server is running
-    When I visit the "home page"
+    When I visit "home page"
     Then I should see "Inventory REST API Service"
+    Then I should not see "404 Not Found"
+
+  Scenario: Accessing the inventory
+    When I visit "inventory"
+    Then I should see "index page of /inventory"
     Then I should not see "404 Not Found"
 
   Scenario: List all products
