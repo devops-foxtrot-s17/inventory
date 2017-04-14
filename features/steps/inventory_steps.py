@@ -5,6 +5,8 @@ from behave import *
 from app import server
 from app.redis_inventory import PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RESTOCK_LEVEL
 
+TYPE = 'type'
+QUANTITY = 'quantity'
 
 @when(u'I visit "{url}"')
 def step_impl(context, url):
@@ -33,13 +35,13 @@ def step_impl(context, id):
 
 @when(u'I change "{key}" to "{value}"')
 def step_impl(context, key, value):
-  data = json.loads(context.resp.data)
-  data[key] = value
+  data={TYPE: key, QUANTITY: int(value)}
   context.resp.data = json.dumps(data)
 
 
-@when(u'I update "{url}" with id "{id}"')
-def step_impl(context, url, id):
+@when(u'I update product with id "{id}"')
+def step_impl(context, id):
+  url='inventory/products'
   target_url = '/{}/{}'.format(url, id)
   context.resp = context.app.put(target_url, data=context.resp.data, content_type='application/json')
   assert context.resp.status_code == 200
@@ -57,7 +59,7 @@ def step_impl(context, message):
 
 @then(u'I should have "{field}" equals to "{val}"')
 def step_impl(context, field, val):
-  data = json.loads(context.resp.data)[field]
+  data = str(json.loads(context.resp.data)[field])
   assert data == val
 
 

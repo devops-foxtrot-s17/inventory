@@ -32,3 +32,8 @@ Feature: The pet store service back-end
     And I should have "location_id" equals to "122"
     And I should not see "404 Not Found"
 
+  Scenario: Update one product
+    When I retrieve product with id "11"
+    And I change "used" to "23"
+    And I update product with id "11"
+    Then I should have "used" equals to "23"
