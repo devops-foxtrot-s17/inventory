@@ -26,4 +26,9 @@ Feature: The pet store service back-end
     And I should see "21"
     And I should see "31"
 
-    
+  Scenario: List one product
+    When I retrieve product with id "11"
+    Then I should see "11"
+    And I should have "location_id" equals to "122"
+    And I should not see "404 Not Found"
+

@@ -23,6 +23,14 @@ def step_impl(context, url, id):
   assert context.resp.data is ""
 
 
+@when(u'I retrieve product with id "{id}"')
+def step_impl(context, id):
+  url = 'inventory/products'
+  target_url = '/{}/{}'.format(url, id)
+  context.resp = context.app.get(target_url)
+  assert context.resp.status_code == 200
+
+
 @when(u'I change "{key}" to "{value}"')
 def step_impl(context, key, value):
   data = json.loads(context.resp.data)
@@ -45,6 +53,12 @@ def step_impl(context, message):
 @then(u'I should not see "{message}"')
 def step_impl(context, message):
   assert message not in context.resp.data
+
+
+@then(u'I should have "{field}" equals to "{val}"')
+def step_impl(context, field, val):
+  data = json.loads(context.resp.data)[field]
+  assert data == val
 
 
 @given(u'the following products')
