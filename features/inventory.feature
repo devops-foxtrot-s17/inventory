@@ -14,3 +14,11 @@ Feature: The pet store service back-end
     When I visit the "home page"
     Then I should see "Inventory REST API Service"
     Then I should not see "404 Not Found"
+
+  Scenario: List all products
+    When I visit "inventory/products"
+    Then I should see "11"
+    And I should see "21"
+    And I should see "31"
+
+    
