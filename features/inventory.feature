@@ -43,3 +43,14 @@ Feature: The pet store service back-end
     Then I should not have "product_id" equals to "11"
     And I should not have "product_id" equals to "21"
     And I should not have "product_id" equals to "31"
+
+  Scenario: Delete a product
+    When I visit "inventory/products"
+    Then I should see "11"
+    And I should see "21"
+    And I should see "31"
+    When I delete a product with id "11"
+    And I visit "inventory/products"
+    Then I should see "31"
+    And I should see "21"
+    And I should not see "11"
