@@ -25,8 +25,9 @@ def step_impl(context, restock_level):
   assert context.resp.status_code == 201
 
 
-@when(u'I delete "{url}" with id "{id}"')
-def step_impl(context, url, id):
+@when(u'I delete a product with id "{id}"')
+def step_impl(context, id):
+  url = 'inventory/products'
   target_url = '/{}/{}'.format(url, id)
   context.resp = context.app.delete(target_url)
   assert context.resp.status_code == 204

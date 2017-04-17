@@ -51,3 +51,15 @@ Feature: The pet store service back-end
     Then I should have "used" equals to "0"
     Then I should have "new" equals to "0"
     Then I should have "open_box" equals to "0"
+
+
+  Scenario: Delete a product
+    When I visit "inventory/products"
+    Then I should see "11"
+    And I should see "21"
+    And I should see "31"
+    When I delete a product with id "11"
+    And I visit "inventory/products"
+    Then I should see "31"
+    And I should see "21"
+    And I should not see "11"
