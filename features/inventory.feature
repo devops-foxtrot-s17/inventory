@@ -43,3 +43,11 @@ Feature: The pet store service back-end
     Then I should not have "product_id" equals to "11"
     And I should not have "product_id" equals to "21"
     And I should not have "product_id" equals to "31"
+
+
+  Scenario: Clear storage of a product
+    When I clear product "11" out of the inventory
+    When I retrieve product with id "11"
+    Then I should have "used" equals to "0"
+    Then I should have "new" equals to "0"
+    Then I should have "open_box" equals to "0"
