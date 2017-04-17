@@ -63,3 +63,13 @@ Feature: The pet store service back-end
     Then I should see "31"
     And I should see "21"
     And I should not see "11"
+
+  Scenario: Get product with certain type
+    When I retrieve product with id "11"
+    And I change "used" to "0"
+    And I update product with id "11"
+    Then I should have "used" equals to "0"
+    When I visit "inventory/product?type=used"
+    Then I should not see "11"
+    And I should see "21"
+    And I should see "31"
