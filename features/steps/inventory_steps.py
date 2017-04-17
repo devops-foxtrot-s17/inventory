@@ -7,6 +7,7 @@ from app.redis_inventory import PRODUCT_ID, LOCATION_ID, USED, NEW, OPEN_BOX, RE
 
 TYPE = 'type'
 QUANTITY = 'quantity'
+PRODUCTS_URL = 'inventory/products'
 
 @when(u'I visit "{url}"')
 def step_impl(context, url):
@@ -19,9 +20,8 @@ def step_impl(context, url):
 
 @when(u'I create a product with restock level "{restock_level}"')
 def step_impl(context, restock_level):
-  target_url = '/inventory/products'
   data = json.dumps({RESTOCK_LEVEL: int(restock_level)})
-  context.resp = context.app.post(target_url, data=data, content_type='application/json')
+  context.resp = context.app.post(PRODUCTS_URL, data=data, content_type='application/json')
   assert context.resp.status_code == 201
 
 
@@ -36,8 +36,7 @@ def step_impl(context, id):
 
 @when(u'I retrieve product with id "{id}"')
 def step_impl(context, id):
-  url = 'inventory/products'
-  target_url = '/{}/{}'.format(url, id)
+  target_url = '/{}/{}'.format(PRODUCTS_URL, id)
   context.resp = context.app.get(target_url)
   assert context.resp.status_code == 200
 
@@ -50,11 +49,16 @@ def step_impl(context, key, value):
 
 @when(u'I update product with id "{id}"')
 def step_impl(context, id):
-  url = 'inventory/products'
-  target_url = '/{}/{}'.format(url, id)
+  target_url = '/{}/{}'.format(PRODUCTS_URL, id)
   context.resp = context.app.put(target_url, data=context.resp.data, content_type='application/json')
   assert context.resp.status_code == 200
 
+
+@when('I clear product "{id}" out of the inventory')
+def step_impl(context, id):
+  target_url = '/{}/{}/clear'.format(PRODUCTS_URL, id)
+  context.resp = context.app.put(target_url)
+  assert context.resp.status_code == 200
 
 @then(u'I should see "{message}"')
 def step_impl(context, message):
