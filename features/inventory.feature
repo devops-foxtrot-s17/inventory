@@ -26,14 +26,20 @@ Feature: The pet store service back-end
     And I should see "21"
     And I should see "31"
 
-  Scenario: List one product
+  Scenario: List a product
     When I retrieve product with id "11"
     Then I should see "11"
     And I should have "location_id" equals to "122"
     And I should not see "404 Not Found"
 
-  Scenario: Update one product
+  Scenario: Update a product
     When I retrieve product with id "11"
     And I change "used" to "23"
     And I update product with id "11"
     Then I should have "used" equals to "23"
+
+  Scenario: Create a product
+    When I create a product with restock level "111"
+    Then I should not have "product_id" equals to "11"
+    And I should not have "product_id" equals to "21"
+    And I should not have "product_id" equals to "31"
