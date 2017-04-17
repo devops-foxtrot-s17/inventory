@@ -20,7 +20,7 @@ def step_impl(context, url):
 @when(u'I create a product with restock level "{restock_level}"')
 def step_impl(context, restock_level):
   target_url = '/inventory/products'
-  data = json.dumps({"restock_level": int(restock_level)})
+  data = json.dumps({RESTOCK_LEVEL: int(restock_level)})
   context.resp = context.app.post(target_url, data=data, content_type='application/json')
   assert context.resp.status_code == 201
 
