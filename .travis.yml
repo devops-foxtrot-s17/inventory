@@ -9,5 +9,8 @@ install: "pip install -r requirements.txt"
 before_script: redis-cli ping
 script: nosetests
 
+after_success:
+  - codecov --token=b45e8877-bf9d-4657-bca1-0af9e0ba4d41
+
 services:
   - redis-server

@@ -2,6 +2,8 @@
 Inventory keeps track of how many products in warehouse.
 
 [![Build Status](https://travis-ci.org/devops-foxtrot-s17/inventory.svg?branch=master)](https://travis-ci.org/devops-foxtrot-s17/inventory)
+[![Codecov](https://img.shields.io/codecov/c/github/devops-foxtrot-s17/inventory.svg)]()
+<a href="https://zenhub.com"><img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png"></a>
 
 ### This service provides APIs:
 - listing all products
