@@ -1,6 +1,8 @@
 # inventory
 Inventory keeps track of how many products in warehouse.
 
+[![Build Status](https://travis-ci.org/devops-foxtrot-s17/inventory.svg?branch=master)](https://travis-ci.org/devops-foxtrot-s17/inventory)
+
 ### This service provides APIs:
 - listing all products
 - get single product with id
