@@ -1,7 +1,7 @@
-Feature: The pet store service back-end
-  As a Pet Store Owner
-  I need a RESTful catalog service
-  So that I can keep track of all my pets
+Feature: The inventory service back-end
+  As a Inventory manager
+  I need a RESTful service
+  So that I can keep track of all my products in inventory
 
   Background:
     Given the following products
