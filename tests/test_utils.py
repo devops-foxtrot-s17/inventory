@@ -18,6 +18,12 @@ class TestInventoryServer(unittest.TestCase):
     utils.Redis = Mock(return_value=mock_redis_client)
     mock_redis_client.ping = Mock(return_value=True)
     utils.connect_to_redis = Mock(side_effect=connect_to_redis)
+    mock_os = Mock()
+    mock_os.environ = {}
+    utils.os = mock_os
+
+  def tearDown(self):
+    utils.os = os
 
   def test_info_is_valid(self):
     info = {server.TYPE: USED, server.QUANTITY: 20}
@@ -54,14 +60,11 @@ class TestInventoryServer(unittest.TestCase):
     port = 5006
     password = 'a_password'
 
-    mock_os = Mock()
     service = json.dumps({'rediscloud':
                             [{'credentials': {'hostname': host_name, 'port': port, 'password': password}}]})
-    mock_os.environ = {'VCAP_SERVICES': service}
-    utils.os = mock_os
+    utils.os.environ = {'VCAP_SERVICES': service}
 
     utils.init_redis_client()
-    utils.os = os
     utils.connect_to_redis.assert_called_with(host_name, port, password)
 
   def test_init_redis_client_with_local_server(self):
