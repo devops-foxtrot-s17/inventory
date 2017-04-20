@@ -44,7 +44,23 @@ def get_product_list():
       status 200 if succeeded
   """
   all_products = inventory.get_all()
-  return make_response(jsonify(all_products), HTTP_200_OK)
+  arg = request.args.get(TYPE)
+
+  if arg is None or not arg:
+    response = make_response(jsonify(all_products), HTTP_200_OK)
+
+  else:
+    arg = arg.lower()
+    if arg != OPEN_BOX and arg != NEW and arg != USED:
+      response = make_response('Invalid type, must be one of these fields: open_box, new, used', HTTP_400_BAD_REQUEST)
+    else:
+      l = []
+      for product in inventory.get_all():
+        if arg in product and int(product[arg]) > 0:
+          l.append(product)
+      response = make_response(jsonify(l), HTTP_200_OK)
+
+  return response
 
 
 @app.route('/inventory/products/<int:id>', methods=['GET'])
@@ -150,35 +166,6 @@ def create_products():
     response.headers['Location'] = url_for('get_one_product', id=product_id)
   else:
     response = make_response('No restock level provided or illegal restock level value', HTTP_400_BAD_REQUEST)
-  return response
-
-
-@app.route('/inventory/product', methods=['GET'])
-def get_products_with_type():
-  """ Gets products with quantity of type larger than 0
-
-
-  Returns:
-    response: add successful message with status 200 if succeeded
-              or no type provided or found 400 bad request.
-  """
-  l = []
-  arg = request.args.get(TYPE)
-
-  if arg is None or not arg:
-    response = make_response('Invalid argument, need the type of product as one of the fields: open_box, new, used',
-                             HTTP_400_BAD_REQUEST)
-    return response
-  arg = arg.lower()
-
-  if arg != OPEN_BOX and arg != NEW and arg != USED:
-    response = make_response('Invalid type, must be one of these fields: open_box, new, used', HTTP_400_BAD_REQUEST)
-    return response
-
-  for product in inventory.get_all():
-    if arg in product and int(product[arg]) > 0:
-      l.append(product)
-  response = make_response(jsonify(l), HTTP_200_OK)
   return response
 
 
