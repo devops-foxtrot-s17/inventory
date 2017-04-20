@@ -157,7 +157,7 @@ class TestInventoryServer(unittest.TestCase):
     id = len(server.inventory.get_all())
     product = server.inventory.get_product(id)
 
-    resp = self.app.get('/inventory/product?type=new')
+    resp = self.app.get('/inventory/products?type=new')
     self.assertEqual(resp.status_code, server.HTTP_200_OK)
     data = json.loads(resp.data)
     self.assertIn(product, data)
@@ -169,17 +169,13 @@ class TestInventoryServer(unittest.TestCase):
     id = len(server.inventory.get_all())
     product = server.inventory.get_product(id)
 
-    resp = self.app.get('/inventory/product?type=NEW')
+    resp = self.app.get('/inventory/products?type=NEW')
     self.assertEqual(resp.status_code, server.HTTP_200_OK)
     data = json.loads(resp.data)
     self.assertIn(product, data)
 
-  def test_get_products_with_type_invalid_argument_missing_fields(self):
-    resp = self.app.get('/inventory/product?type=')
-    self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
-
   def test_get_products_with_type_invalid_argument_wrong_key_word(self):
-    resp = self.app.get('/inventory/product?type=python3')
+    resp = self.app.get('/inventory/products?type=python3')
     self.assertEqual(resp.status_code, server.HTTP_400_BAD_REQUEST)
 
   def test_clear_storage(self):

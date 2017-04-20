@@ -69,7 +69,7 @@ Feature: The inventory service back-end
     And I change "used" to "0"
     And I update product with id "11"
     Then I should have "used" equals to "0"
-    When I visit "inventory/product?type=used"
+    When I visit "inventory/products?type=used"
     Then I should not see "11"
     And I should see "21"
     And I should see "31"
