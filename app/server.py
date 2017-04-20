@@ -107,17 +107,23 @@ def update_product(id):
 
 @app.route('/inventory/products/<int:id>', methods=['DELETE'])
 def delete_product(id):
-  """ delete a product by id
-    This method will delete an existing product from inventory
-    or simply will do nothing if it does not exist.
-
-    Args:
-      id (int): The id of the product to be deleted
-
-    Returns:
-      response: Delete successful message with status 204 if product exist and is deleted
-                or no product found with status 404 if product does not exist
- """
+  """
+  Delete a Product
+  This endpoint will delete a Product based the id specified in the path
+  ---
+  tags:
+    - Products
+  description: Deletes a Product from the database
+  parameters:
+    - name: id
+      in: path
+      description: ID of product to delete
+      type: integer
+      required: true
+  responses:
+    204:
+      description: Product deleted
+  """
   inventory.delete_product(id)
   return make_response('', HTTP_204_NO_CONTENT)
 
