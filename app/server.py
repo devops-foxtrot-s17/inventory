@@ -65,16 +65,46 @@ def get_product_list():
 
 @app.route('/inventory/products/<int:id>', methods=['GET'])
 def get_one_product(id):
-  """ Get info about a specific product
-    This method will get the info about an item with it's product id
-
-    Args:
-      id (int): The id of the product to be update
-
-    Returns:
-      response: product id information(product id, location id, used/new/open_box, total_quantity, restock_level)
-      status 200 if succeeded
-      or no product found with status 404 if cannot found the product
+  """
+    Retrieve a single Product
+    This endpoint will return a Product based on it's id
+    ---
+    tags:
+      - Products
+    produces:
+      - application/json
+    parameters:
+      - name: id
+        in: path
+        description: ID of product to retrieve
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Product returned
+        schema:
+          id: Product
+          properties:
+            product_id:
+              type: integer
+              description: unique id assigned internally by service
+            location_id:
+              type: integer
+              description: unique location id assigned internally by service
+            restock_level:
+              type: integer
+              description: max space allocated for the product
+            new:
+              type: integer
+              description: quantity of new products
+            used:
+              type: integer
+              description: quantity of used products
+            open_box:
+              type: integer
+              description: quantity of open_box products
+      404:
+        description: Product not found
     """
   product = inventory.get_product(id)
   if product is not None:
