@@ -207,14 +207,46 @@ def create_products():
 
 @app.route('/inventory/products/<int:id>/clear', methods=['PUT'])
 def clear_storage(id):
-  """ Clears a product out of inventory
-      (total quantity -> 0)
-
-  Args:
-    id (int): The id of the product
-  Returns:
-    response: add successful message with status 200 if succeeded
-              or no product found with status 404 if cannot found the product
+  """
+    Clear storage of a product
+    This endpoint will clear all the storage of a product
+    ---
+    tags:
+      - Products
+    produces:
+      - application/json
+    parameters:
+      - name: id
+        in: path
+        description: ID of pet to retrieve
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Product returned
+        schema:
+          id: Product
+          properties:
+            product_id:
+              type: integer
+              description: unique id assigned internally by service
+            location_id:
+              type: integer
+              description: unique location id assigned internally by service
+            restock_level:
+              type: integer
+              description: max space allocated for the product
+            new:
+              type: integer
+              description: quantity of new products
+            used:
+              type: integer
+              description: quantity of used products
+            open_box:
+              type: integer
+              description: quantity of open_box products
+      404:
+        description: Product not found
   """
   data = inventory.get_product(id)
   if data is None:
