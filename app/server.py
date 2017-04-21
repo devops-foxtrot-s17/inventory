@@ -36,13 +36,47 @@ def inventory_index():
 
 @app.route('/inventory/products', methods=['GET'])
 def get_product_list():
-  """ Get info about all products
-    This method will get the info about all the products
-
-    Returns:
-      response: product information(product id, location id, used/new/open_box, total_quantity, restock_level)
-      status 200 if succeeded
   """
+    Retrieve a list of Products
+    This endpoint will return all Products unless a query parameter is specificed
+    ---
+    tags:
+      - Products
+    description: The Products endpoint allows you to query Products
+    parameters:
+      - name: type
+        in: query
+        description: The type of Products you are looking for
+        required: false
+        type: string
+    responses:
+      200:
+        description: An array of Products
+        schema:
+          type: array
+          items:
+            schema:
+              id: Product
+              properties:
+                product_id:
+                  type: integer
+                  description: unique id assigned internally by service
+                location_id:
+                  type: integer
+                  description: unique location id assigned internally by service
+                restock_level:
+                  type: integer
+                  description: max space allocated for the product
+                new:
+                  type: integer
+                  description: quantity of new products
+                used:
+                  type: integer
+                  description: quantity of used products
+                open_box:
+                  type: integer
+                  description: quantity of open_box products
+    """
   all_products = inventory.get_all()
   arg = request.args.get(TYPE)
 
