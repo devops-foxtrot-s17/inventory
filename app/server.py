@@ -277,7 +277,7 @@ def create_products():
           properties:
             restock_level:
               type: integer
-              description: total space allocated for the product
+              description: the quantity limit for this product
     responses:
       201:
         description: Product created
