@@ -256,16 +256,54 @@ def delete_product(id):
 
 @app.route('/inventory/products', methods=['POST'])
 def create_products():
-  """ create a product with restock level.
-  This method will create a storage for a new product
-
-  Args: data with restock_level provided.
-
-  Returns:
-
-    response: create successful message with status 201 if succeeded,
-              the auto assigned product id and location id should also be presented
-              or invalid create with status 400 if the create request violates any limitation
+  """
+    Creates a Product
+    This endpoint will create a Product based the data in the body that is posted
+    ---
+    tags:
+      - Products
+    consumes:
+      - application/json
+    produces:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          id: data
+          required:
+            - restock_level
+          properties:
+            restock_level:
+              type: integer
+              description: total space allocated for the product
+    responses:
+      201:
+        description: Product created
+        schema:
+          id: Product
+          properties:
+            product_id:
+              type: integer
+              description: unique id assigned internally by service
+            location_id:
+              type: integer
+              description: unique location id assigned internally by service
+            restock_level:
+              type: integer
+              description: max space allocated for the product
+            new:
+              type: integer
+              description: quantity of new products
+            used:
+              type: integer
+              description: quantity of used products
+            open_box:
+              type: integer
+              description: quantity of open_box products
+      400:
+        description: Bad Request (the posted data was not valid)
   """
   data = request.get_json()
   if RESTOCK_LEVEL in data and type(data[RESTOCK_LEVEL]) is int and data[RESTOCK_LEVEL] > 0:
