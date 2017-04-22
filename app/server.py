@@ -149,19 +149,65 @@ def get_one_product(id):
 
 @app.route('/inventory/products/<int:id>', methods=['PUT'])
 def update_product(id):
-  """ change product quantity to certain amount
-  This method will change product quantity to certain amount in the inventory
-  (eg. certain amount in new, open box or used.)
-
-  Args:
-    id (int): The id of the product to be added to
-    data: {type: [used|new|open_box], quantity: [quantity]}
-
-  Returns:
-    response: add successful message with status 200 if succeeded
-              or no product found with status 404 if cannot found the product
-              or invalid update with status 400 if the update violates any limitation.
   """
+    Update a Product
+    This endpoint will update a Product based on the data that is posted
+    ---
+    tags:
+      - Products
+    consumes:
+      - application/json
+    produces:
+      - application/json
+    parameters:
+      - name: id
+        in: path
+        description: ID of product to retrieve
+        type: integer
+        required: true
+      - in: body
+        name: body
+        schema:
+          id: data
+          required:
+            - type
+            - quantity
+          properties:
+            type:
+              type: string
+              description: type for the Product
+            quantity:
+              type: integer
+              description: the quantity type you specified
+    responses:
+      200:
+        description: Product returned
+        schema:
+          id: Product
+          properties:
+            product_id:
+              type: integer
+              description: unique id assigned internally by service
+            location_id:
+              type: integer
+              description: unique location id assigned internally by service
+            restock_level:
+              type: integer
+              description: max space allocated for the product
+            new:
+              type: integer
+              description: quantity of new products
+            used:
+              type: integer
+              description: quantity of used products
+            open_box:
+              type: integer
+              description: quantity of open_box products
+      400:
+        description: Bad Request (the posted data was not valid)
+      404:
+        description: Product not found
+    """
   data = inventory.get_product(id)
   info = request.get_json()
 
@@ -252,7 +298,7 @@ def clear_storage(id):
     parameters:
       - name: id
         in: path
-        description: ID of pet to retrieve
+        description: ID of product to retrieve
         type: integer
         required: true
     responses:
